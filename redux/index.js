@@ -1,7 +1,7 @@
 import { combineReducers, createStore, applyMiddleware } from "redux";
+import devToolsEnhancer from "remote-redux-devtools";
 import thunk from "redux-thunk";
 import axios from "axios";
-
 /*
 https://www.imaginarycloud.com/blog/react-native-redux/
 https://blog.jscrambler.com/how-to-use-redux-persist-in-react-native-with-asyncstorage/
@@ -9,19 +9,43 @@ https://blog.jscrambler.com/how-to-use-redux-persist-in-react-native-with-asyncs
 import AsyncStorage from "@react-native-community/async-storage";
 import { persistStore, persistReducer } from "redux-persist";
 
+const INITIAL_STATE = {
+  state: {},
+  menu: [],
+};
+
 // reducers
-const userReducer = (state = {}, action) => {
+const userReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case "DO_LOGIN":
       return {
         ...state,
         user: action.payload,
       };
-    case "FETCH_RESTAURANTS":
+    case "ADD_ITEM":
+      //let menu =[...state.menu, action.payload];
       return {
         ...state,
-        restaurants: action.payload,
+        menu: [...state.menu, action.payload],
       };
+    case "INC_ITEM":
+      const index = state.menu.findIndex((i) => i._id == action.payload);
+      const menu = [...state.menu];
+      menu[index].quantity = menu[index].quantity + 1;
+      return {
+        ...state,
+        menu: menu,
+      };
+    case "DEV_RESET":
+      return {
+        state: [],
+        menu: [],
+      };
+    // case "FETCH_RESTAURANTS":
+    //   return {
+    //     ...state,
+    //     restaurants: action.payload,
+    //   };
     case "ON_ERROR":
       return {
         ...state,
@@ -44,9 +68,12 @@ export const rootReducer = combineReducers({
 
 // store
 const persistedReducer = persistReducer(persistConfig, rootReducer);
-export const store = createStore(persistedReducer); //applyMiddleware(thunk));
+export const store = createStore(persistedReducer, applyMiddleware(thunk)); //;
 export const persistor = persistStore(store);
 
+/*
+Functions
+*/
 export const onUserLogin = async ({ email, password }) => {
   const response = await axios.post(
     "http://192.168.2.12:4000/drivers/loginDriver",

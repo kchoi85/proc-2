@@ -1,9 +1,9 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { useSelector, connect } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { onUserLogin } from "../redux/index";
-import { store } from "../redux/index";
+// import { store } from "../redux/index";
 
 const LoginScreen = () => {
   const { user } = useSelector((state) => state.userReducer);
@@ -29,6 +29,7 @@ const LoginScreen = () => {
         <Text style={{ color: "#FFF", fontSize: 18 }}>User Login</Text>
       </TouchableOpacity>
       <Text>message: {user?.message}</Text>
+      <Text>token: {user?.token}</Text>
     </View>
   );
 };

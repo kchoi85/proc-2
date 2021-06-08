@@ -15,71 +15,57 @@ import {
 
 // import { isIphoneX } from "react-native-iphone-x-helper";
 import { icons, COLORS, SIZES, FONTS, images } from "../constants";
+import { store } from "../redux";
+import { useSelector } from "react-redux";
+import { set } from "react-hook-form";
 
 export default function ItemScreen({ route, navigation }) {
   const { _id, item, details, price } = route.params;
   const [text, onChangeText] = React.useState("");
 
-  const [orderItems, setOrderItem] = React.useState([]);
+  const { menu } = useSelector((state) => state.userReducer);
+  console.log(useSelector((state) => state.userReducer));
 
-  function editOrder(action, itemId, price) {
-    //console.log(_id, item, details, price);
-    let orderList = orderItems.slice(); // duplicate orderItem array into orderList
-    // itemC -> item in Cart
-    let itemC = orderList.filter((a) => a.itemId == itemId);
-    // Array [
-    //     Object {
-    //       "item": "3 Pc Tenders Combo (1 Reg Side, 1 Biscuit and a Drink)",
-    //       "itemId": "60ae966b0d9d1e10a8cd0e64",
-    //       "price": 2.33,
-    //       "quantity": 1,
-    //     },
-    //   ]
+  function editOrder(action, itemId, itemName, price) {
+    //let cartItems = menu.slice(); // duplicate existing menu (cart) array
+    let cartItem = menu.filter((existingItem) => existingItem._id === itemId);
 
     if (action == "+") {
-      if (itemC.length > 0) {
-        let newQty = itemC[0].quantity + 1;
-        itemC[0].quantity = newQty;
-        //item[0].total = item[0].quantity * price
+      if (cartItem.length > 0) {
+        store.dispatch({ type: "INC_ITEM", payload: _id });
       } else {
+        //item dne in cart
         const newItem = {
-          item: route.params.item,
+          _id: itemId,
+          item: itemName,
           quantity: 1,
           price: price,
         };
-        orderList.push(newItem);
+
+        store.dispatch({ type: "ADD_ITEM", payload: newItem });
       }
-      setOrderItem(orderList);
-      //console.log(orderItems);
-    } else {
-      if (itemC.length > 0) {
-        if (itemC[0].quantity > 0) {
-          let newQty = itemC[0].quantity - 1;
-          itemC[0].quantity = newQty;
-        }
-      }
-      setOrderItem(orderList);
-      //console.log(orderItems);
+    }
+
+    if (action == "-") {
+      store.dispatch({ type: "DEV_RESET" });
     }
   }
 
-  function getOrderQty(itemId) {
-    let orderItem = orderItems.filter((a) => (a.itemId = itemId));
-    console.log(orderItem);
-    if (orderItem.length > 0) {
-      return orderItem[0].quantity;
+  function getItemQty(itemId) {
+    let cartItem = menu.filter((existingItem) => existingItem._id === itemId);
+    if (cartItem.length > 0) {
+      return cartItem[0].quantity;
     } else {
       return 0;
     }
   }
 
-  function getCartCount() {
-    let itemCount = orderItems.reduce((a, b) => a + (b.quantity || 0), 0);
-    return itemCount;
-  }
+  // function getCartCount() {
+  //   let itemCount = orderItems.reduce((a, b) => a + (b.quantity || 0), 0);
+  //   return itemCount;
+  // }
 
   function renderHeader() {
-    //console.log(route.params.item);
     return (
       <ImageBackground
         source={images.pizza_restaurant}
@@ -206,7 +192,7 @@ export default function ItemScreen({ route, navigation }) {
               borderBottomLeftRadius: 25,
               ...styles.shadow,
             }}
-            onPress={() => editOrder("-", _id, price)}
+            onPress={() => editOrder("-", _id, item, price)}
           >
             <Text style={{ fontSize: 40 }}>-</Text>
           </TouchableOpacity>
@@ -220,7 +206,7 @@ export default function ItemScreen({ route, navigation }) {
               ...styles.shadow,
             }}
           >
-            <Text style={{ fontSize: 30 }}>{getOrderQty(_id)}</Text>
+            <Text style={{ fontSize: 30 }}>{getItemQty(_id)}</Text>
           </View>
 
           <TouchableOpacity
@@ -233,13 +219,13 @@ export default function ItemScreen({ route, navigation }) {
               borderBottomRightRadius: 25,
               ...styles.shadow,
             }}
-            onPress={() => editOrder("+", _id, price)}
+            onPress={() => editOrder("+", _id, item, price)}
           >
             <Text style={{ fontSize: 30 }}>+</Text>
           </TouchableOpacity>
         </View>
         <View>
-          <Text>{getCartCount()}</Text>
+          <Text>getCartCount()</Text>
         </View>
       </View>
     );

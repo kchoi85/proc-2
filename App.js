@@ -47,20 +47,22 @@ export default function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <LoginScreen />
+        {/* <LoginScreen /> */}
+        <NavigationContainer>
+          <Stack.Navigator
+            screenOptions={{ headerShown: false }}
+            initialRouteName={"HomeScreen"}
+          >
+            <Stack.Screen name="HomeScreen" component={Tabs} />
+            <Stack.Screen
+              name="RestaurantScreen"
+              component={RestaurantScreen}
+            />
+            <Stack.Screen name="ItemScreen" component={ItemScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
       </PersistGate>
     </Provider>
-
-    // <NavigationContainer>
-    //   <Stack.Navigator
-    //     screenOptions={{ headerShown: false }}
-    //     initialRouteName={"HomeScreen"}
-    //   >
-    //     <Stack.Screen name="HomeScreen" component={Tabs} />
-    //     <Stack.Screen name="RestaurantScreen" component={RestaurantScreen} />
-    //     <Stack.Screen name="ItemScreen" component={ItemScreen} />
-    //   </Stack.Navigator>
-    // </NavigationContainer>
   );
 }
 

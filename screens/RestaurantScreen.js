@@ -22,7 +22,6 @@ export default function RestaurantScreen({ route, navigation }) {
 
   React.useEffect(() => {
     let { item, currentLocation } = route.params;
-
     setRestaurant(item);
     setLocation(currentLocation);
   });
