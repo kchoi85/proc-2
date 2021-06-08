@@ -12,6 +12,7 @@ import { persistStore, persistReducer } from "redux-persist";
 const INITIAL_STATE = {
   state: {},
   menu: [],
+  sTotal: 0,
 };
 
 // reducers
@@ -23,10 +24,10 @@ const userReducer = (state = INITIAL_STATE, action) => {
         user: action.payload,
       };
     case "ADD_ITEM":
-      //let menu =[...state.menu, action.payload];
       return {
         ...state,
         menu: [...state.menu, action.payload],
+        sTotal: state.sTotal + action.payload.price,
       };
     case "INC_ITEM":
       const index = state.menu.findIndex((i) => i._id == action.payload);
@@ -35,11 +36,13 @@ const userReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         menu: menu,
+        sTotal: state.sTotal + menu[index].price,
       };
     case "DEV_RESET":
       return {
         state: [],
         menu: [],
+        sTotal: 0,
       };
     // case "FETCH_RESTAURANTS":
     //   return {

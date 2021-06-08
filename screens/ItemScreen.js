@@ -24,7 +24,12 @@ export default function ItemScreen({ route, navigation }) {
   const [text, onChangeText] = React.useState("");
 
   const { menu } = useSelector((state) => state.userReducer);
+  const { sTotal } = useSelector((state) => state.userReducer);
   console.log(useSelector((state) => state.userReducer));
+
+  function dispatchSTotal() {
+    store.dispatch;
+  }
 
   function editOrder(action, itemId, itemName, price) {
     //let cartItems = menu.slice(); // duplicate existing menu (cart) array
@@ -59,6 +64,12 @@ export default function ItemScreen({ route, navigation }) {
       return 0;
     }
   }
+
+  // function getSubTotal() {
+  //   let subTotal = 0;
+  //   menu.forEach((item) => (subTotal = item.quantity * item.price));
+  //   return subTotal;
+  // }
 
   // function getCartCount() {
   //   let itemCount = orderItems.reduce((a, b) => a + (b.quantity || 0), 0);
@@ -225,7 +236,7 @@ export default function ItemScreen({ route, navigation }) {
           </TouchableOpacity>
         </View>
         <View>
-          <Text>getCartCount()</Text>
+          <Text>Sub Total: {sTotal.toFixed(2)}</Text>
         </View>
       </View>
     );
