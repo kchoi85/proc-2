@@ -11,10 +11,14 @@ import {
   FlatList,
   ImageBackground,
   Platform,
+  Dimensions,
+  ScrollView,
 } from "react-native";
 
 // import { isIphoneX } from "react-native-iphone-x-helper";
 import { icons, COLORS, SIZES, FONTS, images } from "../constants";
+import { store } from "../redux";
+import { useSelector } from "react-redux";
 
 export default function RestaurantScreen({ route, navigation }) {
   const [restaurant, setRestaurant] = React.useState(null);
@@ -24,7 +28,9 @@ export default function RestaurantScreen({ route, navigation }) {
     let { item, currentLocation } = route.params;
     setRestaurant(item);
     setLocation(currentLocation);
-  });
+  }, []);
+
+  const { menu } = useSelector((state) => state.userReducer); // total of shopping cart
 
   function renderHeader() {
     return (
@@ -32,7 +38,7 @@ export default function RestaurantScreen({ route, navigation }) {
         source={images.pizza_restaurant}
         style={{
           width: "100%",
-          height: 250,
+          height: 200,
           flexDirection: "row",
         }}
       >
@@ -74,7 +80,7 @@ export default function RestaurantScreen({ route, navigation }) {
               marginTop: SIZES.padding,
             }}
           >
-            <Text>Delivery</Text>
+            <Text>18 Yonge St.</Text>
           </View>
         </View>
         <View>
@@ -88,9 +94,10 @@ export default function RestaurantScreen({ route, navigation }) {
               height: 40,
               width: 40,
               backgroundColor: "white",
+              marginRight: SIZES.padding * 2,
               marginTop: SIZES.padding,
             }}
-            onPress={() => navigation.goBack()}
+            onPress={() => store.dispatch({ type: "DEV_RESET" })}
           >
             <Image
               source={icons.list}
@@ -149,7 +156,8 @@ export default function RestaurantScreen({ route, navigation }) {
   }
 
   function menuItem() {
-    const renderEachMenu = ({ item }) => (
+    //item=menuItem
+    const renderEachMenu = (item) => (
       //|| {item.price} || {item.details}
       <View style={styles.menus}>
         <TouchableOpacity
@@ -198,8 +206,9 @@ export default function RestaurantScreen({ route, navigation }) {
         </Text>
         <FlatList
           data={restaurant?.menu}
-          keyExtractor={({ _id }, index) => _id}
-          renderItem={renderEachMenu}
+          keyExtractor={({ _id }) => _id}
+          // keyExtractor={(index) => index.toString()}
+          renderItem={({ item }) => renderEachMenu(item)}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             paddingBottom: 30,
@@ -209,11 +218,59 @@ export default function RestaurantScreen({ route, navigation }) {
     );
   }
 
+  // click button to go to checkout page
+  function menuCart() {
+    const screenHeight = Dimensions.get("screen").height;
+
+    let resId = restaurant?._id;
+    let fullcart = {
+      restaurantId: resId,
+      menu: menu,
+    };
+
+    if (menu.length > 0) {
+      return (
+        <View
+          style={{
+            position: "absolute",
+            top: screenHeight * 0.915,
+          }}
+        >
+          <TouchableOpacity
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: COLORS.black,
+              height: 50,
+              paddingHorizontal: SIZES.padding * 7,
+            }}
+            onPress={() => {
+              navigation.navigate("CheckOutScreen", fullcart);
+            }}
+          >
+            <Text style={{ color: "white" }}>
+              {menu.length} item(s) in cart
+            </Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
-      {renderHeader()}
-      {imageHeader()}
-      {menuItem()}
+    <SafeAreaView
+      style={styles.container}
+      showsHorizontalScrollIndicator={false}
+    >
+      <View>
+        {renderHeader()}
+        {imageHeader()}
+      </View>
+      <View>
+        <ScrollView>{menuItem()}</ScrollView>
+      </View>
+
+      {menuCart()}
     </SafeAreaView>
   );
 }
@@ -222,7 +279,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.lightGray2,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 20,
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
   menus: {
     flexDirection: "row",

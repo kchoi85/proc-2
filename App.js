@@ -21,7 +21,20 @@ import { persistor } from "./redux/index";
 
 import Tabs from "./navigation/tabs";
 import HomeScreen from "./screens/HomeScreen";
-import { RestaurantScreen, ItemScreen, LoginScreen } from "./screens";
+import {
+  RestaurantScreen,
+  ItemScreen,
+  CheckOutScreen,
+  AccountScreen,
+  LoginScreen,
+  WalletScreen,
+  RegisterScreen,
+  AccSettingsScreen,
+  LocationScreen,
+  OrderScreen,
+  HelpScreen,
+  SearchScreen,
+} from "./screens";
 
 const Stack = createStackNavigator();
 //    <CredentialsContext.Provider value={CredentialsContext}>
@@ -29,20 +42,6 @@ const Stack = createStackNavigator();
 // export const CredentialsContext = React.createContext(null);
 export default function App() {
   //const [isLoading, setLoading] = useState(true);
-  // const [data, setData] = useState([]);
-
-  // useEffect(() => {
-  //   fetch('http://localhost:4000/restaurants/getRestaurants', {
-  //     method: 'GET',
-  //     headers: {
-  //       "Content-Type": "application/json"
-  //     }
-  //   })
-  //     .then((response) => response.json())
-  //     .then((json) => setData(json.restaurants))
-  //     .catch((error) => console.error(error))
-  //   //.finally(() => setLoading(false));
-  // }, []);
 
   return (
     <Provider store={store}>
@@ -59,6 +58,23 @@ export default function App() {
               component={RestaurantScreen}
             />
             <Stack.Screen name="ItemScreen" component={ItemScreen} />
+            <Stack.Screen name="CheckOutScreen" component={CheckOutScreen} />
+
+            <Stack.Screen name="LoginScreen" component={LoginScreen} />
+            <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+            <Stack.Screen
+              name="AccSettingsScreen"
+              component={AccSettingsScreen}
+            />
+            <Stack.Screen name="AccountScreen" component={AccountScreen} />
+
+            <Stack.Screen name="WalletScreen" component={WalletScreen} />
+
+            <Stack.Screen name="SearchScreen" component={SearchScreen} />
+
+            <Stack.Screen name="LocationScreen" component={LocationScreen} />
+            <Stack.Screen name="OrderScreen" component={OrderScreen} />
+            <Stack.Screen name="HelpScreen" component={HelpScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </PersistGate>

@@ -10,22 +10,27 @@ import {
   TextInput,
   SafeAreaView,
 } from "react-native";
-import { useSelector } from "react-redux";
-
 import { icons, COLORS, SIZES, FONTS, images } from "../constants";
+import { useSelector } from "react-redux";
 
 import { store } from "../redux/index";
 import axios from "axios";
 
-export default function LoginScreen({ navigation }) {
-  const [id, setId] = React.useState("");
-  const [pass, setPass] = React.useState("");
+export default function RegisterScreen({ navigation }) {
+  const [name, setName] = React.useState(null);
+  const [id, setId] = React.useState(null); //email
+  const [phone, setPhone] = React.useState(null);
+  const [pass, setPass] = React.useState(null);
+  const [passCnfrm, setPassCnfrm] = React.useState(null);
+  const [passMatch, setPassMatch] = React.useState(null);
 
   const { user, appError, userLoggedIn } = useSelector(
     (state) => state.userReducer
   );
 
-  // if user logs in successfully, userLoggedin == true.
+  useSelector((state) => console.log(state.userReducer));
+
+  // if user registers successfully, userLoggedin == true.
   // since this code is re-run, we check if userLoggedin==true
   // if true, go back to account page
   React.useEffect(() => {
@@ -83,74 +88,133 @@ export default function LoginScreen({ navigation }) {
               marginTop: SIZES.padding,
             }}
           >
-            <Text style={{ fontWeight: "bold" }}>Client Login</Text>
+            <Text style={{ fontWeight: "bold" }}>Client Register</Text>
           </View>
         </View>
       </View>
     );
   }
 
-  const onUserLogin = async ({ email, password }) => {
+  const onUserRegister = async ({ email, name, password, phone, address }) => {
     try {
       const response = await axios.post(
-        "http://192.168.2.12:4000/users/loginUser",
+        "http://192.168.2.12:4000/users/registerUser",
         {
           email,
+          name,
           password,
+          phone,
+          address,
         }
       );
-      store.dispatch({ type: "DO_LOGIN", payload: response.data });
+      store.dispatch({ type: "DO_REGISTER", payload: response.data });
     } catch (error) {
       store.dispatch({ type: "ON_ERROR", payload: error });
     }
   };
 
-  function renderLogin() {
+  function renderRegister() {
     return (
       <View style={styles.body}>
         <View>
           <TextInput
             style={styles.creds}
+            onChangeText={setName}
+            placeholder="Full Name"
+          />
+
+          <TextInput
+            style={styles.creds}
             onChangeText={setId}
             placeholder="Email Address"
           />
+
           <TextInput
             style={styles.creds}
-            onChangeText={setPass}
+            onChangeText={setPhone}
+            placeholder="Phone Number"
+          />
+
+          <TextInput
+            style={styles.creds}
+            onChangeText={(e) => {
+              setPass(e);
+              if (e === passCnfrm) {
+                setPass(e);
+                setPassMatch(null);
+              } else {
+                setPass(e);
+                setPassMatch("Password does not match");
+              }
+            }}
             placeholder="Password"
+            autoCompleteType={"off"}
+            autoCorrect={"false"}
+            secureTextEntry={"true"}
+          />
+          <TextInput
+            style={styles.creds}
+            onChangeText={(e) => {
+              setPassCnfrm(e);
+              if (e === pass) {
+                setPassCnfrm(e);
+                setPassMatch(null);
+              } else {
+                setPassCnfrm(e);
+                setPassMatch("Password does not match");
+              }
+            }}
+            placeholder="Confirm Password"
             autoCompleteType={"off"}
             autoCorrect={"false"}
             secureTextEntry={"true"}
           />
         </View>
 
-        <View style={{ flexDirection: "row" }}>
+        <View>
+          <Text>{passMatch}</Text>
+        </View>
+        <View>
           <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              onUserLogin({ email: id, password: pass });
-
-              //   setTimeout(() => {
-              //     navigation.goBack();
-              //   }, 2000);
+            style={{
+              height: 30,
+              width: 110,
+              backgroundColor: "black",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 20,
             }}
-          >
-            <Text style={{ color: "#FFF" }}>Login</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("RegisterScreen")}
+            onPress={() => {
+              // if passMatch (which should be null if pass === passCnfrm) is not null
+              // or name / id / phone / pass / passCnfrm fields are empty
+              if (passMatch || !name || !id || !phone || !pass || !passCnfrm) {
+                console.log("not registered");
+              }
+              // else all good to register
+              // const { email, name, password, phone, address } = req.body;
+              else {
+                onUserRegister({
+                  email: id,
+                  name: name,
+                  password: pass,
+                  phone: phone,
+                  address: "",
+                });
+              }
+            }}
           >
             <Text style={{ color: "#FFF" }}>Register</Text>
           </TouchableOpacity>
-        </View>
 
-        <View style={styles.credInfo}>
-          <Text>message: {user?.message}</Text>
-          <Text>_id: {user?._id}</Text>
-          <Text>token: {user?.token}</Text>
-          <Text>error: {appError?.message}</Text>
+          <View style={styles.credInfo}>
+            <Text>
+              fields: {name} - {id} - {phone} - {pass} - {passCnfrm} -
+            </Text>
+            <Text>message: {user?.message}</Text>
+            <Text>_id: {user?._id}</Text>
+            <Text>token: {user?.token}</Text>
+            <Text>error: {appError?.message}</Text>
+          </View>
         </View>
       </View>
     );
@@ -159,7 +223,7 @@ export default function LoginScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       {renderHeader()}
-      {renderLogin()}
+      {renderRegister()}
     </SafeAreaView>
   );
 }
@@ -185,14 +249,5 @@ const styles = StyleSheet.create({
   credInfo: {
     paddingTop: 20,
     color: "grey",
-  },
-  button: {
-    height: 30,
-    width: 110,
-    backgroundColor: "black",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 20,
-    marginLeft: 5,
   },
 });

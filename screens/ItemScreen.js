@@ -22,13 +22,21 @@ import { set } from "react-hook-form";
 export default function ItemScreen({ route, navigation }) {
   const { _id, item, details, price } = route.params;
   const [text, onChangeText] = React.useState("");
+  const [itemCount, setItemCount] = React.useState(1);
 
   const { menu } = useSelector((state) => state.userReducer);
-  const { sTotal } = useSelector((state) => state.userReducer);
+  const { sTotal } = useSelector((state) => state.userReducer); // total of shopping cart
   console.log(useSelector((state) => state.userReducer));
 
-  function dispatchSTotal() {
-    store.dispatch;
+  function addToCart(itemId, itemName, price, count) {
+    const newItem = {
+      _id: itemId,
+      item: itemName,
+      quantity: count,
+      pricePerOne: price,
+    };
+    store.dispatch({ type: "ADD_ITEM", payload: newItem });
+    navigation.goBack();
   }
 
   function editOrder(action, itemId, itemName, price) {
@@ -186,7 +194,7 @@ export default function ItemScreen({ route, navigation }) {
         <View
           style={{
             position: "absolute",
-            bottom: -20,
+            bottom: "10%",
             width: SIZES.width,
             height: 60,
             justifyContent: "center",
@@ -201,10 +209,16 @@ export default function ItemScreen({ route, navigation }) {
               justifyContent: "center",
               borderTopLeftRadius: 25,
               borderBottomLeftRadius: 25,
+
               ...styles.shadow,
             }}
-            onPress={() => editOrder("-", _id, item, price)}
+            onPress={() => {
+              if (itemCount > 1) {
+                setItemCount(itemCount - 1);
+              }
+            }}
           >
+            {/* editOrder("-", _id, item, price) */}
             <Text style={{ fontSize: 40 }}>-</Text>
           </TouchableOpacity>
 
@@ -217,7 +231,7 @@ export default function ItemScreen({ route, navigation }) {
               ...styles.shadow,
             }}
           >
-            <Text style={{ fontSize: 30 }}>{getItemQty(_id)}</Text>
+            <Text style={{ fontSize: 30 }}>{itemCount}</Text>
           </View>
 
           <TouchableOpacity
@@ -230,23 +244,53 @@ export default function ItemScreen({ route, navigation }) {
               borderBottomRightRadius: 25,
               ...styles.shadow,
             }}
-            onPress={() => editOrder("+", _id, item, price)}
+            onPress={() => setItemCount(itemCount + 1)}
           >
+            {/* editOrder("+", _id, item, price) */}
             <Text style={{ fontSize: 30 }}>+</Text>
           </TouchableOpacity>
-        </View>
-        <View>
-          <Text>Sub Total: {sTotal.toFixed(2)}</Text>
         </View>
       </View>
     );
   }
 
+  function addItemToCart() {
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          paddingTop: SIZES.padding * 2,
+        }}
+      >
+        <TouchableOpacity
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: COLORS.black,
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+            borderBottomLeftRadius: 30,
+            borderBottomRightRadius: 30,
+            height: "120%",
+            width: "80%",
+          }}
+          onPress={() => addToCart(_id, item, price, itemCount)}
+        >
+          <Text style={{ fontWeight: "normal", fontSize: 20, color: "white" }}>
+            Add {itemCount} to cart · ${(price * itemCount).toFixed(2)}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
-    <SafeAreaView>
+    <SafeAreaView showsHorizontalScrollIndicator={false}>
       {renderHeader()}
       {infoSection()}
       {orderSection()}
+      {addItemToCart()}
     </SafeAreaView>
   );
 }

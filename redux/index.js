@@ -7,12 +7,15 @@ https://www.imaginarycloud.com/blog/react-native-redux/
 https://blog.jscrambler.com/how-to-use-redux-persist-in-react-native-with-asyncstorage/
 */
 import AsyncStorage from "@react-native-community/async-storage";
+//import { AsyncStorage } from "react-native";
+
 import { persistStore, persistReducer } from "redux-persist";
 
 const INITIAL_STATE = {
-  state: {},
+  userLoggedIn: false,
+  user: {},
   menu: [],
-  sTotal: 0,
+  favRes: [],
 };
 
 // reducers
@@ -22,12 +25,47 @@ const userReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         user: action.payload,
+        userLoggedIn: true,
+      };
+    case "DO_LOGOUT":
+      return {
+        userLoggedIn: false,
+        user: {},
+        menu: [],
+      };
+    case "DO_REGISTER":
+      return {
+        ...state,
+        user: action.payload,
+        userLoggedIn: true,
+      };
+    case "DO_FAVORITE":
+      const favRes = [...state.favRes];
+      if (favRes.indexOf(action.payload) == -1) {
+        return {
+          ...state,
+          favRes: [...state.favRes, action.payload],
+        };
+      }
+      return {
+        ...state,
+      };
+    case "DO_UNFAVORITE":
+      const unFavRes = [...state.favRes];
+      if (unFavRes.indexOf(action.payload) !== -1) {
+        return {
+          ...state,
+          favRes: state.favRes.filter((item) => item !== action.payload),
+        };
+      }
+      return {
+        ...state,
       };
     case "ADD_ITEM":
       return {
         ...state,
         menu: [...state.menu, action.payload],
-        sTotal: state.sTotal + action.payload.price,
+        //sTotal: state.sTotal + action.payload.price,
       };
     case "INC_ITEM":
       const index = state.menu.findIndex((i) => i._id == action.payload);
@@ -36,13 +74,18 @@ const userReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         menu: menu,
-        sTotal: state.sTotal + menu[index].price,
       };
     case "DEV_RESET":
       return {
-        state: [],
+        userLoggedIn: false,
+        user: {},
         menu: [],
-        sTotal: 0,
+        favRes: [],
+      };
+    case "SUBMIT_ORDER":
+      return {
+        ...state,
+        menu: [],
       };
     // case "FETCH_RESTAURANTS":
     //   return {
@@ -77,17 +120,6 @@ export const persistor = persistStore(store);
 /*
 Functions
 */
-export const onUserLogin = async ({ email, password }) => {
-  const response = await axios.post(
-    "http://192.168.2.12:4000/drivers/loginDriver",
-    {
-      email,
-      password,
-    }
-  );
-  store.dispatch({ type: "DO_LOGIN", payload: response.data });
-  //console.log(store.getState().userReducer.user.token);
-};
 
 export const onFetchRestaurants = ({ email, password }) => {
   return async (dispatch) => {
