@@ -8,226 +8,27 @@ import {
   StatusBar,
   TouchableOpacity,
   Image,
+  ImageBackground,
   FlatList,
   ScrollView,
+  LogBox,
 } from "react-native";
 import { store } from "../redux";
 import { useSelector } from "react-redux";
+import { EXPRESS_SERVER } from "@env";
 
 import { icons, images, SIZES, COLORS, FONTS } from "../constants";
 
 export default function HomeScreen({ navigation }) {
-  console.log(useSelector((state) => state.userReducer));
-  // const [loaded] = useFonts({
-  //   RobotoBold: require("../assets/fonts/Roboto-Bold.ttf"),
-  //   RobotoBlack: require("../assets/fonts/Roboto-Black.ttf"),
-  //   RobotoRegular: require("../assets/fonts/Roboto-Regular.ttf"),
-  // });
-
-  function renderHeader() {
-    return (
-      <View
-        style={{
-          flexDirection: "row",
-          height: 60,
-          alignItems: "center",
-          justifyContent: "center",
-          paddingBottom: 10,
-        }}
-      >
-        <TouchableOpacity
-          style={{
-            // width: 50,
-            paddingLeft: SIZES.padding * 2,
-            justifyContent: "center",
-          }}
-          onPress={() => navigation.navigate("SearchScreen")}
-        >
-          <Image
-            source={icons.search}
-            resizeMode="contain"
-            style={{
-              width: 25,
-              height: 25,
-            }}
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          onPress={() => {
-            navigation.navigate("LocationScreen");
-          }}
-        >
-          <View
-            style={{
-              width: "80%",
-              height: 40,
-              backgroundColor: COLORS.lightGray3,
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: SIZES.radius,
-            }}
-          >
-            <Text style={{ fontSize: 20 }}>18 Yonge St.</Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={{
-            width: 50,
-            paddingRight: SIZES.padding * 2,
-            justifyContent: "center",
-          }}
-          onPress={() => store.dispatch({ type: "DEV_RESET" })}
-        >
-          <Image
-            source={icons.basket}
-            resizeMode="contain"
-            style={{
-              width: 25,
-              height: 25,
-            }}
-          ></Image>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  //=====================================================================================================================
-
-  // function renderMainCategories() {
-  //   const renderItem = ({ item }) => {
-  //     return (
-  //       <TouchableOpacity
-  //         style={{
-  //           padding: SIZES.padding,
-  //           paddingBottom: SIZES.padding * 2,
-  //           borderRadius: SIZES.radius,
-  //           alignItems: "center",
-  //           justifyContent: "center",
-  //           marginRight: SIZES.padding,
-  //           ...styles.shadow,
-  //         }}
-  //         //onPress={() => onSelectCategory(item)}
-  //       >
-  //         <View
-  //           style={{
-  //             width: 50,
-  //             height: 50,
-  //             borderRadius: 25,
-  //             alignItems: "center",
-  //             justifyContent: "center",
-  //             backgroundColor: COLORS.lightGray,
-  //           }}
-  //         >
-  //           <Image
-  //             source={icons.basket}
-  //             resizeMode="contain"
-  //             style={{
-  //               width: 30,
-  //               height: 30,
-  //             }}
-  //           />
-  //         </View>
-
-  //         <Text
-  //           style={{
-  //             marginTop: SIZES.padding,
-  //             color:
-  //               selectedCategory?.id == item.id ? COLORS.white : COLORS.black,
-  //             ...FONTS.body5,
-  //           }}
-  //         >
-  //           {item.name}
-  //         </Text>
-  //       </TouchableOpacity>
-  //     );
-  //   };
-
-  //   return (
-  //     <View style={{ padding: SIZES.padding * 2 }}>
-  //       <Text
-  //         style={{
-  //           fontFamily: "RobotoBlack",
-  //           fontSize: 36,
-  //           paddingBottom: 0,
-  //         }}
-  //       >
-  //         Main
-  //       </Text>
-  //       <Text
-  //         style={{
-  //           fontFamily: "RobotoBlack",
-  //           fontSize: 36,
-  //           marginTop: -10,
-  //         }}
-  //       >
-  //         Categories
-  //       </Text>
-
-  //       <FlatList
-  //         data={data}
-  //         horizontal
-  //         showsHorizontalScrollIndicator={false}
-  //         keyExtractor={({ _id }, index) => _id}
-  //         renderItem={({ item }) => {
-  //           <TouchableOpacity
-  //             style={{
-  //               padding: SIZES.padding,
-  //               paddingBottom: SIZES.padding * 2,
-  //               backgroundColor: COLORS.primary,
-  //               borderRadius: SIZES.radius,
-  //               alignItems: "center",
-  //               justifyContent: "center",
-  //               marginRight: SIZES.padding,
-  //               ...styles.shadow,
-  //             }}
-  //             //onPress={() => onSelectCategory(item)}
-  //           >
-  //             <View
-  //               style={{
-  //                 width: 50,
-  //                 height: 50,
-  //                 borderRadius: 25,
-  //                 alignItems: "center",
-  //                 justifyContent: "center",
-  //                 backgroundColor: COLORS.lightGray,
-  //               }}
-  //             >
-  //               <Image
-  //                 source={icons.basket}
-  //                 resizeMode="contain"
-  //                 style={{
-  //                   width: 30,
-  //                   height: 30,
-  //                 }}
-  //               />
-  //             </View>
-  //             <Text
-  //               style={{
-  //                 marginTop: SIZES.padding,
-  //                 color: COLORS.black,
-  //                 ...FONTS.body5,
-  //               }}
-  //             >
-  //               {item.name}
-  //             </Text>
-  //           </TouchableOpacity>;
-  //         }}
-  //         contentContainerStyle={{ paddingVertical: SIZES.padding * 2 }}
-  //       />
-  //     </View>
-  //   );
-  // }
-
-  //=====================================================================================================================
-
+  // {DEBUG} console.log(useSelector((state) => state.userReducer));
   //const [isLoading, setLoading] = useState(true);
   const [restaurantsArr, setRestaurants] = useState([]);
 
+  var { favRes } = useSelector((state) => state.userReducer);
+
   useEffect(() => {
-    fetch("http://192.168.2.12:4000/restaurants/getRestaurants", {
+    LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
+    fetch(`${EXPRESS_SERVER}/restaurants/getRestaurants`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -238,14 +39,136 @@ export default function HomeScreen({ navigation }) {
       .catch((error) => console.error(error));
     //.finally(() => setLoading(false));
   }, []);
-  // console.log(restaurantsArr);
 
-  function renderRestaurantList() {
+  function renderHeader() {
+    return (
+      <View
+        style={{
+          paddingTop: 15,
+        }}
+      >
+        <View style={{ justifyContent: "center", alignItems: "center" }}>
+          <Text style={{ color: "#FF5353", fontSize: 16, fontWeight: "bold" }}>
+            DELIVERY
+          </Text>
+        </View>
+        <View>
+          <TouchableOpacity
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              paddingTop: 3,
+              paddingBottom: 10,
+              flexDirection: "row",
+            }}
+            onPress={() => navigation.navigate("LocationScreen")}
+          >
+            <Text style={{ fontSize: 24, fontWeight: "bold" }}>
+              18 Yonge St
+            </Text>
+            <Text style={{ fontSize: 10, paddingLeft: 5 }}>▼</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  function renderCategories() {
+    const navigationRef = React.useRef(null);
+
+    const categories = [
+      {
+        _id: 1,
+        name: "Bubble Tea",
+        img: `${EXPRESS_SERVER}/uploads/categories/Bubble_Tea.png`,
+      },
+
+      {
+        _id: 2,
+        name: "Chicken",
+        img: `${EXPRESS_SERVER}/uploads/categories/Chicken.png`,
+      },
+      {
+        _id: 3,
+        name: "Sushi",
+        img: `${EXPRESS_SERVER}/uploads/categories/Sushi.png`,
+      },
+      {
+        _id: 4,
+        name: "Traditional",
+        img: `${EXPRESS_SERVER}/uploads/categories/Traditional.png`,
+      },
+      {
+        _id: 5,
+        name: "Korean",
+        img: `${EXPRESS_SERVER}/uploads/categories/Korean.png`,
+      },
+      {
+        _id: 6,
+        name: "Chinese",
+        img: `${EXPRESS_SERVER}/uploads/categories/Chinese.png`,
+      },
+      {
+        _id: 7,
+        name: "Mexican",
+        img: `${EXPRESS_SERVER}/uploads/categories/Mexican.png`,
+      },
+      {
+        _id: 8,
+        name: "Alcohol",
+        img: `${EXPRESS_SERVER}/uploads/categories/Alcohol.png`,
+      },
+      {
+        _id: 9,
+        name: "Vegetarian",
+        img: `${EXPRESS_SERVER}/uploads/categories/Vegetarian.png`,
+      },
+      {
+        _id: 10,
+        name: "Sandwich & Subs",
+        img: `${EXPRESS_SERVER}/uploads/categories/Sandwich_Subs.png`,
+      },
+    ];
+
+    function renderCatItems(item) {
+      return (
+        <View>
+          <TouchableOpacity
+            style={{
+              marginRight: 10,
+              width: 93,
+              height: 93,
+            }}
+            onPress={() => {
+              // navigationRef.current?.navigate("SearchScreen");
+              navigation.navigate("SearchScreen", { item });
+            }}
+          >
+            <Image
+              source={{ uri: item.img }}
+              style={{ width: "100%", height: "100%", borderRadius: 10 }}
+            />
+            <Text
+              style={{
+                position: "absolute",
+                left: "8%",
+                bottom: "5%",
+                fontWeight: "bold",
+                color: "white",
+              }}
+            >
+              {item.name}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
     return (
       <View
         style={{
           paddingLeft: SIZES.padding * 2,
-          paddingRight: SIZES.padding * 2,
         }}
       >
         <Text
@@ -266,130 +189,141 @@ export default function HomeScreen({ navigation }) {
         >
           Categories
         </Text>
-        {/* ====================================================================== */}
 
+        <FlatList
+          data={categories}
+          horizontal={true}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => renderCatItems(item)}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+        />
+        <View style={{ paddingTop: 25, paddingBottom: 8 }}>
+          <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+            Your Local Restaurants
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  //=====================================================================================================================
+
+  function renderRestaurantList() {
+    return (
+      <View>
         {/* Restaurants List */}
         <FlatList
           data={restaurantsArr}
-          keyExtractor={({ _id }) => _id}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() =>
-                navigation.navigate("RestaurantScreen", {
-                  item,
-                })
-              }
-            >
-              <View>
-                <Image
-                  source={images.pizza_restaurant}
-                  resizeMode="cover"
-                  style={{
-                    width: "100%",
-                    height: 180,
-                    borderTopLeftRadius: 10,
-                    borderTopRightRadius: 10,
-                  }}
-                  borderRadius={SIZES.radius}
-                />
-                <View
-                  style={{
-                    position: "absolute",
-                    top: 10,
-                    right: 10,
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={() => {
-                      store.dispatch({
-                        type: "DO_FAVORITE",
-                        payload: item._id,
-                      });
-                    }}
-                  >
-                    <Image
-                      source={icons.like}
-                      resizeMode="contain"
-                      style={{
-                        width: 25,
-                        height: 25,
-                      }}
-                    ></Image>
-                  </TouchableOpacity>
-                </View>
-                <View
-                  style={{
-                    position: "absolute",
-                    bottom: 0,
-                    height: 30,
-                    width: SIZES.width * 0.3,
-                    backgroundColor: COLORS.lightGray4,
-
-                    // borderTopRightRadius: SIZES.radius,
-                    // borderBottomRightRadius: SIZES.radius,
-
-                    alignItems: "center",
-                    justifyContent: "center",
-                    ...styles.shadow,
-                  }}
-                >
-                  <Text
-                    style={{
-                      // fontFamily: "RobotoBold",
-                      fontSize: 15,
-                    }}
-                  >
-                    35-40 min
-                  </Text>
-                </View>
-              </View>
-
-              {/* ============================================================= */}
-
-              {/* Restaurant Info */}
-              <View
-                style={{
-                  paddingTop: 5,
-                  paddingBottom: 5,
-                  paddingLeft: 10,
-                  backgroundColor: "white",
-                  borderBottomLeftRadius: 10,
-                  borderBottomRightRadius: 10,
-                }}
+          contentContainerStyle={{ paddingBottom: 60 }}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item, index }) => {
+            return (
+              <TouchableOpacity
+                style={styles.card}
+                onPress={() =>
+                  navigation.navigate("RestaurantScreen", {
+                    item,
+                  })
+                }
               >
-                <Text
-                  style={{
-                    flexDirection: "row",
+                <View>
+                  <Image
+                    source={{ uri: `${EXPRESS_SERVER}/${item.resBanner}` }}
+                    resizeMode="cover"
+                    style={styles.cardImage}
+                  />
+                  <View
+                    style={{
+                      position: "absolute",
+                      top: 10,
+                      right: 10,
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => {
+                        store.dispatch({
+                          type: "DO_FAVORITE",
+                          payload: item,
+                        });
+                      }}
+                    >
+                      <Image
+                        source={icons.like}
+                        resizeMode="contain"
+                        style={{
+                          width: 25,
+                          height: 25,
+                          tintColor: "white", //FF5353
+                        }}
+                      ></Image>
+                    </TouchableOpacity>
+                  </View>
+                  <View
+                    style={{
+                      position: "absolute",
+                      bottom: 0,
+                      height: 30,
+                      width: SIZES.width * 0.3,
+                      backgroundColor: "white",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        // fontFamily: "RobotoBold",
+                        fontSize: 15,
+                      }}
+                    >
+                      {item.deliveryTime}
+                    </Text>
+                  </View>
+                </View>
 
-                    fontSize: 18,
-                    fontWeight: "bold",
-                  }}
-                >
-                  {item.name}
-                </Text>
+                {/* ============================================================= */}
 
-                {/* Stars keywords moneysign */}
+                {/* Restaurant Info */}
                 <View
                   style={{
-                    paddingBottom: 10,
-                    flexDirection: "row",
+                    paddingTop: 5,
+
+                    paddingLeft: 10,
+                    backgroundColor: "white",
+                    borderBottomLeftRadius: 10,
+                    borderBottomRightRadius: 10,
                   }}
                 >
-                  {/* Categories */}
                   <Text
                     style={{
-                      // fontFamily: "RobotoRegular",
-                      fontSize: 14,
+                      flexDirection: "row",
 
-                      color: "black",
+                      fontSize: 17,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {item.name}
+                  </Text>
+
+                  {/* Stars keywords moneysign */}
+                  <View
+                    style={{
+                      paddingBottom: 10,
                       flexDirection: "row",
                     }}
                   >
-                    Pizza · Salad · Burger ·
-                  </Text>
-                  {/* Price
+                    {/* Categories */}
+                    <Text
+                      style={{
+                        // fontFamily: "RobotoRegular",
+                        fontSize: 14,
+
+                        color: "black",
+                      }}
+                    >
+                      {item.type}
+                    </Text>
+                    {/* Price
                   {[1, 2, 3].map((priceRating) => (
                     <Text
                       key={priceRating}
@@ -405,8 +339,8 @@ export default function HomeScreen({ navigation }) {
                     </Text>
                   ))} */}
 
-                  {/* Rating */}
-                  <Image
+                    {/* Rating */}
+                    {/* <Image
                     source={icons.star}
                     style={{
                       height: 15,
@@ -416,21 +350,41 @@ export default function HomeScreen({ navigation }) {
                       marginLeft: 5,
                       marginRight: 5,
                     }}
-                  />
-                  <Text
-                    style={{
-                      // fontFamily: "RobotoRegular",
-                      fontSize: 14,
-                      color: "black",
-                      marginRight: 5,
-                    }}
-                  >
-                    4.8
-                  </Text>
+                  /> */}
+                    <View
+                      style={{
+                        position: "absolute",
+                        right: "5%",
+                        bottom: "100%",
+                        width: 30,
+                        height: 20,
+                        backgroundColor: "#FF5353",
+                        borderRadius: 5,
+                      }}
+                    >
+                      <View
+                        style={{
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            // fontFamily: "RobotoRegular",
+                            fontSize: 14,
+                            color: "white",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {item.rating}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
                 </View>
-              </View>
-            </TouchableOpacity>
-          )}
+              </TouchableOpacity>
+            );
+          }}
         />
       </View>
     );
@@ -439,7 +393,11 @@ export default function HomeScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       {renderHeader()}
-      <ScrollView>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      >
+        {renderCategories()}
         {/* {renderMainCategories()} */}
         {renderRestaurantList()}
       </ScrollView>
@@ -452,7 +410,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.lightGray4,
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 10,
-    paddingBottom: Platform.OS === "android" ? StatusBar.currentHeight : 10,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-evenly",
+    paddingBottom: 10,
+    paddingLeft: SIZES.padding * 2,
+    paddingRight: SIZES.padding * 2,
   },
   shadow: {
     shadowColor: "#000",
@@ -465,15 +430,21 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   card: {
-    paddingBottom: SIZES.padding,
-    shadowColor: "#000",
+    shadowColor: "rgb(0, 0, 0)",
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 3,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
-
-    elevation: 8,
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 4,
+    backgroundColor: "white",
+    marginLeft: SIZES.padding * 2,
+    marginRight: SIZES.padding * 2,
+    marginBottom: 15, //between each cards
+  },
+  cardImage: {
+    width: "100%",
+    height: 150,
   },
 });

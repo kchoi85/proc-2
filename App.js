@@ -34,9 +34,11 @@ import {
   OrderScreen,
   HelpScreen,
   SearchScreen,
+  FavoritesScreen,
 } from "./screens";
 
 const Stack = createStackNavigator();
+
 //    <CredentialsContext.Provider value={CredentialsContext}>
 
 // export const CredentialsContext = React.createContext(null);
@@ -69,12 +71,12 @@ export default function App() {
             <Stack.Screen name="AccountScreen" component={AccountScreen} />
 
             <Stack.Screen name="WalletScreen" component={WalletScreen} />
-
             <Stack.Screen name="SearchScreen" component={SearchScreen} />
 
             <Stack.Screen name="LocationScreen" component={LocationScreen} />
             <Stack.Screen name="OrderScreen" component={OrderScreen} />
             <Stack.Screen name="HelpScreen" component={HelpScreen} />
+            <Stack.Screen name="FavoritesScreen" component={FavoritesScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </PersistGate>

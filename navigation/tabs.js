@@ -12,6 +12,7 @@ import {
   SearchScreen,
   OrderScreen,
   AccountScreen,
+  FavoritesScreen,
 } from "../screens";
 
 import { COLORS, icons } from "../constants";
@@ -24,7 +25,7 @@ const TabBarCustomButton = ({ accessibilityState, children, onPress }) => {
   if (isSelected) {
     return (
       <View style={{ flex: 1, alignItems: "center" }}>
-        <View style={{ flexDirection: "row", position: "absolute", top: 0 }}>
+        {/* <View style={{ flexDirection: "row", position: "absolute", top: 0 }}>
           <View style={{ flex: 1, backgroundColor: COLORS.white }}></View>
           <Svg width={75} height={61} viewBox="0 0 75 61">
             <Path
@@ -33,16 +34,13 @@ const TabBarCustomButton = ({ accessibilityState, children, onPress }) => {
             />
           </Svg>
           <View style={{ flex: 1, backgroundColor: COLORS.white }}></View>
-        </View>
+        </View> */}
 
         <TouchableOpacity
           style={{
-            top: -22.5,
             justifyContent: "center",
             alignItems: "center",
-            width: 50,
-            height: 50,
-            borderRadius: 25,
+            height: 55,
             backgroundColor: COLORS.white,
           }}
           onPress={onPress}
@@ -56,7 +54,8 @@ const TabBarCustomButton = ({ accessibilityState, children, onPress }) => {
       <TouchableOpacity
         style={{
           flex: 1,
-          height: 45,
+
+          height: 55,
           backgroundColor: COLORS.white,
         }}
         activeOpacity={1}
@@ -91,6 +90,7 @@ const CustomTabBar = (props) => {
 };
 
 const Tabs = () => {
+  // this is the white background tab part
   return (
     <Tab.Navigator
       tabBarOptions={{
@@ -103,6 +103,7 @@ const Tabs = () => {
           borderTopWidth: 0,
           backgroundColor: "white",
           elevation: 0,
+          height: 60, // height of the tab bar (has to match the ifselected)
         },
       }}
       tabBar={(props) => <CustomTabBar props={props} />}
@@ -118,7 +119,7 @@ const Tabs = () => {
               style={{
                 width: 25,
                 height: 25,
-                tintColor: focused ? COLORS.primary : COLORS.secondary,
+                tintColor: focused ? "#FF5353" /*COLORS.primary*/ : "#B9B9B9", // COLOR.secondary,
               }}
             />
           ),
@@ -137,7 +138,7 @@ const Tabs = () => {
               style={{
                 width: 25,
                 height: 25,
-                tintColor: focused ? COLORS.primary : COLORS.secondary,
+                tintColor: focused ? COLORS.primary : "#B9B9B9",
               }}
             />
           ),
@@ -155,7 +156,7 @@ const Tabs = () => {
               style={{
                 width: 25,
                 height: 25,
-                tintColor: focused ? COLORS.primary : COLORS.secondary,
+                tintColor: focused ? COLORS.primary : "#B9B9B9",
               }}
             />
           ),
@@ -164,7 +165,7 @@ const Tabs = () => {
       />
       <Tab.Screen
         name="Favorites"
-        component={HomeScreen}
+        component={FavoritesScreen}
         options={{
           tabBarIcon: ({ focused }) => (
             <Image
@@ -173,7 +174,7 @@ const Tabs = () => {
               style={{
                 width: 25,
                 height: 25,
-                tintColor: focused ? COLORS.primary : COLORS.secondary,
+                tintColor: focused ? COLORS.primary : "#B9B9B9",
               }}
             />
           ),

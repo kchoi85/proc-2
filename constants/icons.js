@@ -7,6 +7,7 @@ export const fire = require("../assets/icons/fire.png");
 export const fries = require("../assets/icons/fries.png");
 export const hamburger = require("../assets/icons/hamburger.png");
 export const hotdog = require("../assets/icons/hotdog.png");
+export const unlike = require("../assets/icons/unlike.png");
 export const like = require("../assets/icons/like.png");
 export const list = require("../assets/icons/list.png");
 export const location = require("../assets/icons/location.png");
@@ -25,29 +26,30 @@ export const sushi = require("../assets/icons/sushi.png");
 export const user = require("../assets/icons/user.png");
 
 export default {
-    back,
-    car,
-    cutlery,
-    donut,
-    drink,
-    fire,
-    fries,
-    hamburger,
-    hotdog,
-    like,
-    list,
-    location,
-    master_card,
-    nearby,
-    noodle,
-    pin,
-    pizza,
-    red_pin,
-    rice_bowl,
-    salad,
-    search,
-    basket,
-    star,
-    sushi,
-    user,
-}
+  back,
+  car,
+  cutlery,
+  donut,
+  drink,
+  fire,
+  fries,
+  hamburger,
+  hotdog,
+  unlike,
+  like,
+  list,
+  location,
+  master_card,
+  nearby,
+  noodle,
+  pin,
+  pizza,
+  red_pin,
+  rice_bowl,
+  salad,
+  search,
+  basket,
+  star,
+  sushi,
+  user,
+};

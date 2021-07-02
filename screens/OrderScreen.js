@@ -11,22 +11,30 @@ import {
   FlatList,
   Platform,
   ImageBackground,
+  TextInput,
+  ScrollView,
+  LogBox,
 } from "react-native";
 import { icons, COLORS, SIZES, FONTS, images } from "../constants";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import { EXPRESS_SERVER } from "@env";
 
 export default function OrderScreen({ navigation }) {
+  const [searchText, setSearchText] = React.useState(
+    "Search orders by date or restaurant name"
+  );
   const [ordersArray, setOrdersArray] = React.useState([]);
 
   let { user } = useSelector((state) => state.userReducer);
   let uid = user?._id;
 
   React.useEffect(() => {
+    LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
     async function onOrders({ userId }) {
       try {
         const response = await axios.post(
-          "http://192.168.2.12:4000/orders/getAllOrders",
+          `${EXPRESS_SERVER}/orders/getAllOrders`,
           {
             userId,
           }
@@ -44,52 +52,87 @@ export default function OrderScreen({ navigation }) {
     return (
       <View
         style={{
-          flexDirection: "row",
-          height: 60,
-          borderBottomWidth: 0.5,
-          borderBottomColor: "grey",
-          backgroundColor: "white",
+          paddingTop: 15,
         }}
       >
+        <View style={{ justifyContent: "center", alignItems: "center" }}>
+          <Text style={{ color: "#FF5353", fontSize: 16, fontWeight: "bold" }}>
+            DELIVERY
+          </Text>
+        </View>
         <View>
           <TouchableOpacity
             style={{
-              justifyContent: "center",
+              display: "flex",
               alignItems: "center",
-              borderRadius: 200,
-              borderTopEndRadius: 200,
-              height: 40,
-              width: 40,
-              backgroundColor: "white",
-              marginLeft: SIZES.padding * 2,
-              marginTop: SIZES.padding,
+              justifyContent: "center",
+              paddingTop: 3,
+              paddingBottom: 10,
+              flexDirection: "row",
             }}
-            onPress={() => navigation.goBack()}
+            onPress={() => navigation.navigate("LocationScreen")}
           >
-            <Image
-              source={icons.back}
-              resizeMode="contain"
-              style={{
-                width: 20,
-                height: 20,
-              }}
-            />
+            <Text style={{ fontSize: 24, fontWeight: "bold" }}>
+              18 Yonge St
+            </Text>
+            <Text style={{ fontSize: 10, paddingLeft: 5 }}>▼</Text>
           </TouchableOpacity>
         </View>
-        <View>
-          <View
-            style={{
-              height: 40,
-              width: 150,
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: 200,
-              backgroundColor: "white",
-              marginHorizontal: SIZES.padding * 7,
-              marginTop: SIZES.padding,
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>Order</Text>
+      </View>
+    );
+  }
+
+  function renderSearchBar() {
+    function searchFilter(text) {
+      text = text.trim();
+      let regex = new RegExp(text, "i");
+      setOrdersArray(
+        ordersArray.filter((item) => item.restaurantInfo.name.match(regex))
+      );
+      if (ordersArray.length == 0 || searchText.length === 0) {
+        async function onOrders({ userId }) {
+          try {
+            const response = await axios.post(
+              `${EXPRESS_SERVER}/orders/getAllOrders`,
+              {
+                userId,
+              }
+            );
+            // console.log(response.data);
+            setOrdersArray(response.data.orders);
+          } catch (error) {
+            console.log(error);
+          }
+        }
+        onOrders({ userId: uid });
+      }
+    }
+    return (
+      <View style={styles.body}>
+        <View
+          style={{
+            paddingBottom: 10,
+            borderBottomWidth: 0.2,
+            borderBottomColor: "#B6B6B6",
+          }}
+        >
+          <View style={styles.input}>
+            <Image
+              source={icons.search}
+              resizeMode="cover"
+              style={{ width: 20, height: 20 }}
+            />
+            <TextInput
+              style={{ paddingLeft: 10, width: "100%", height: "100%" }}
+              onChangeText={(text) => searchFilter(text)}
+              placeholder={searchText}
+            />
+          </View>
+          {/* space between Top categories and searchBar */}
+          <View style={{ paddingTop: 20 }}>
+            <Text style={{ fontSize: 18, paddingLeft: 5 }}>
+              Ongoing / Past Orders
+            </Text>
           </View>
         </View>
       </View>
@@ -98,27 +141,81 @@ export default function OrderScreen({ navigation }) {
 
   function renderOrders() {
     const renderEachOrder = ({ item }) => {
+      let time = item?.timestamp;
+      time = time.split("-");
+
+      const months = [
+        "Trailer",
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "June",
+        "Jul",
+        "Aug",
+        "Sept",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      let month = Number(time[1]); //6
+      month = months[month];
+      let day = time[2].split("T")[0];
+
       if (item?.orderStatus === "Driver-pending") {
         return (
-          <TouchableOpacity>
+          <TouchableOpacity style={styles.card}>
             <View style={styles.order}>
-              <Text>Restaurant Name: {item?.restaurantInfo.name}</Text>
-              <Text>Total Items: {item?.itemTotal}</Text>
-              <Text>Timestamp: {item?.timestamp}</Text>
-              <Text style={{ color: "red" }}>
-                Order Status: {item?.orderStatus}
-              </Text>
+              <Image
+                source={{
+                  uri: `${EXPRESS_SERVER}/${item.restaurantInfo.resBanner}`,
+                }}
+                rexizeMode="cover"
+                style={styles.cardImage}
+              />
+              <View style={{ paddingLeft: 10 }}>
+                <Text style={{ fontSize: 18 }}>
+                  {item?.restaurantInfo.name}
+                </Text>
+                <Text style={{ color: "#7E7E7E" }}>
+                  {item?.itemTotal} Items · ${item?.total}
+                </Text>
+                <View style={{ flexDirection: "row" }}>
+                  <Text style={{ color: "#7E7E7E" }}>
+                    {month} {day} ·
+                  </Text>
+                  <Text style={{ color: "#FF5353" }}> {item?.orderStatus}</Text>
+                </View>
+              </View>
             </View>
           </TouchableOpacity>
         );
       } else {
         return (
-          <TouchableOpacity>
+          <TouchableOpacity style={styles.card}>
             <View style={styles.order}>
-              <Text>Restaurant Name: {item?.restaurantId}</Text>
-              <Text>Total Items: {item?.itemTotal}</Text>
-              <Text>Timestamp: {item?.timestamp}</Text>
-              <Text>Order Status: {item?.orderStatus}</Text>
+              <Image
+                source={{
+                  uri: `${EXPRESS_SERVER}/${item.restaurantInfo.resBanner}`,
+                }}
+                rexizeMode="cover"
+                style={styles.cardImage}
+              />
+              <View style={{ paddingLeft: 10 }}>
+                <Text style={{ fontSize: 18 }}>
+                  {item?.restaurantInfo.name}
+                </Text>
+                <Text style={{ color: "#7E7E7E" }}>
+                  {item?.itemTotal} Items · ${item?.total}
+                </Text>
+                <View style={{ flexDirection: "row" }}>
+                  <Text style={{ color: "#7E7E7E" }}>
+                    {month} {day} ·
+                  </Text>
+                  <Text style={{ color: "#7E7E7E" }}> {item?.orderStatus}</Text>
+                </View>
+              </View>
             </View>
           </TouchableOpacity>
         );
@@ -126,13 +223,14 @@ export default function OrderScreen({ navigation }) {
     };
 
     return (
-      <View>
+      <View style={styles.body}>
         <FlatList
+          style={{ paddingTop: 5 }}
           data={ordersArray}
           keyExtractor={({ _id }) => _id}
           renderItem={renderEachOrder}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.body}
+          contentContainerStyle={{ paddingBottom: 70 }}
         />
       </View>
     );
@@ -141,7 +239,8 @@ export default function OrderScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       {renderHeader()}
-      {renderOrders()}
+      {renderSearchBar()}
+      <ScrollView>{renderOrders()}</ScrollView>
     </SafeAreaView>
   );
 }
@@ -149,24 +248,42 @@ export default function OrderScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.lightGray2,
+    backgroundColor: COLORS.lightGray4,
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
   body: {
-    paddingLeft: SIZES.padding * 3,
-    paddingRight: SIZES.padding * 3,
-    paddingTop: 30,
-    paddingBottom: 30,
+    paddingTop: 5,
+    paddingLeft: SIZES.padding * 2,
+    paddingRight: SIZES.padding * 2,
+  },
+  input: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingLeft: 15,
+    height: 55,
+    width: "100%",
+    borderRadius: 20,
     backgroundColor: "white",
+    elevation: 2,
   },
-  button: {
-    paddingBottom: 3,
-    paddingTop: 20,
-    borderBottomWidth: 1,
-  },
+
   order: {
-    borderTopWidth: 0.5,
-    borderTopColor: "grey",
-    paddingBottom: 20,
+    flexDirection: "row",
+  },
+  card: {
+    shadowColor: "rgb(0, 0, 0)",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 2,
+    backgroundColor: "white",
+    marginBottom: 5, //between each cards
+  },
+  cardImage: {
+    width: 90,
+    height: 90,
   },
 });

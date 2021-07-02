@@ -6,8 +6,8 @@ import axios from "axios";
 https://www.imaginarycloud.com/blog/react-native-redux/
 https://blog.jscrambler.com/how-to-use-redux-persist-in-react-native-with-asyncstorage/
 */
-import AsyncStorage from "@react-native-community/async-storage";
-//import { AsyncStorage } from "react-native";
+//import AsyncStorage from "@react-native-community/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { persistStore, persistReducer } from "redux-persist";
 
@@ -32,6 +32,7 @@ const userReducer = (state = INITIAL_STATE, action) => {
         userLoggedIn: false,
         user: {},
         menu: [],
+        favRes: [],
       };
     case "DO_REGISTER":
       return {
@@ -41,15 +42,17 @@ const userReducer = (state = INITIAL_STATE, action) => {
       };
     case "DO_FAVORITE":
       const favRes = [...state.favRes];
+
       if (favRes.indexOf(action.payload) == -1) {
         return {
           ...state,
           favRes: [...state.favRes, action.payload],
         };
+      } else {
+        return {
+          ...state,
+        };
       }
-      return {
-        ...state,
-      };
     case "DO_UNFAVORITE":
       const unFavRes = [...state.favRes];
       if (unFavRes.indexOf(action.payload) !== -1) {

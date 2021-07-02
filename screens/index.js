@@ -11,6 +11,7 @@ import AccSettingsScreen from "./AccSettingsScreen";
 import LocationScreen from "./LocationScreen";
 import HelpScreen from "./HelpScreen";
 import SearchScreen from "./SearchScreen";
+import FavoritesScreen from "./FavoritesScreen";
 
 import OrderScreen from "./OrderScreen";
 
@@ -28,4 +29,5 @@ export {
   OrderScreen,
   HelpScreen,
   SearchScreen,
+  FavoritesScreen,
 };

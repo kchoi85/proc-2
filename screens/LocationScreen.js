@@ -10,51 +10,42 @@ import {
   StatusBar,
   FlatList,
   Platform,
-  ImageBackground,
 } from "react-native";
 import { icons, COLORS, SIZES, FONTS, images } from "../constants";
 import { useSelector } from "react-redux";
-
-import RNLocation from "react-native-location";
+import * as Location from "expo-location";
 
 export default function LocationScreen({ navigation }) {
   const [location, setLocation] = React.useState(null);
-  // RNLocation.configure({
-  //   distanceFilter: 20.0, // move 20m, distance resets
-  // });
+  const [errorMsg, setErrorMsg] = React.useState(null);
 
-  // let permission = RNLocation.requestPermission({
-  //   ios: "whenInUse",
-  //   android: {
-  //     detail: "coarse",
-  //     rationale: {
-  //       title: "We need to access your location",
-  //       message: "We use your location to show where you are on the map",
-  //       buttonPositive: "OK",
-  //       buttonNegative: "Cancel",
-  //     },
-  //   },
-  // }).then((res) => console.log(res));
-  RNLocation.requestPermission({
-    ios: "whenInUse",
-    android: {
-      detail: "coarse",
-      rationale: {
-        title: "We need to access your location",
-        message: "We use your location to show where you are on the map",
-        buttonPositive: "OK",
-        buttonNegative: "Cancel",
-      },
-    },
-  }).then(RNLocation.getLatestLocation({ timeout: 100 }));
+  React.useEffect(() => {
+    (async () => {
+      if (Platform.OS === "ios") {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setErrorMsg("Permission to access location was denied");
+        }
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+      } else if (Platform.OS === "android") {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setErrorMsg("Permission to access location was denied");
+        }
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+      }
+    })(); // self invoked
+  }, []);
 
-  // .then((granted) => {
-  //   if (granted) {
-  //     RNLocation.getLatestLocation({ timeout: 10000 }).then((curLoc) => {
-  //       console.log(curLoc);
-  //     });
-  //   }
-  // });
+  let text = "Waiting...";
+  if (errorMsg) {
+    text = errorMsg;
+    alert(text);
+  } else if (location) {
+    text = JSON.stringify(location);
+  }
 
   function renderHeader() {
     return (
@@ -115,9 +106,7 @@ export default function LocationScreen({ navigation }) {
   function locationInfo() {
     return (
       <View style={styles.body}>
-        {/* <Text>Longitude: {location?.coords.longitude}</Text>
-        <Text>Latitude: {location?.coords.latitude}</Text>
-        <Text>Timestamp: {location?.timestamp}</Text> */}
+        <Text>{text}</Text>
       </View>
     );
   }

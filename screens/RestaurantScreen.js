@@ -35,14 +35,15 @@ export default function RestaurantScreen({ route, navigation }) {
   function renderHeader() {
     return (
       <ImageBackground
-        source={images.pizza_restaurant}
+        source={{
+          uri: `http://192.168.2.12:4000/${restaurant?.resBanner}`,
+        }}
         style={{
           width: "100%",
           height: 200,
-          flexDirection: "row",
         }}
       >
-        <View>
+        <View style={{ flexDirection: "row" }}>
           <TouchableOpacity
             style={{
               justifyContent: "center",
@@ -53,7 +54,7 @@ export default function RestaurantScreen({ route, navigation }) {
               width: 40,
               backgroundColor: "white",
               marginLeft: SIZES.padding * 2,
-              marginTop: SIZES.padding,
+              marginTop: StatusBar.currentHeight + 5,
             }}
             onPress={() => navigation.goBack()}
           >
@@ -66,24 +67,6 @@ export default function RestaurantScreen({ route, navigation }) {
               }}
             />
           </TouchableOpacity>
-        </View>
-        <View>
-          <View
-            style={{
-              height: 45,
-              width: 150,
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: SIZES.radius,
-              backgroundColor: COLORS.lightGray3,
-              marginHorizontal: SIZES.padding * 7,
-              marginTop: SIZES.padding,
-            }}
-          >
-            <Text>18 Yonge St.</Text>
-          </View>
-        </View>
-        <View>
           <TouchableOpacity
             style={{
               width: 50,
@@ -95,7 +78,9 @@ export default function RestaurantScreen({ route, navigation }) {
               width: 40,
               backgroundColor: "white",
               marginRight: SIZES.padding * 2,
-              marginTop: SIZES.padding,
+              marginTop: StatusBar.currentHeight + 5,
+              position: "absolute",
+              right: 0,
             }}
             onPress={() => store.dispatch({ type: "DEV_RESET" })}
           >
@@ -122,7 +107,7 @@ export default function RestaurantScreen({ route, navigation }) {
           style={{ width: "100%", height: 180 }}
         /> */}
         {/*========== stars + ratings + pizza*/}
-        <View style={{ marginLeft: 15, marginTop: 5, marginBottom: 30 }}>
+        <View style={styles.body}>
           <View>
             <Text style={{ fontSize: 30, fontWeight: "bold" }}>
               {restaurant?.name}
@@ -140,15 +125,24 @@ export default function RestaurantScreen({ route, navigation }) {
               }}
             />
 
-            <View>
-              <Text>4.8 (200+ ratings) · Pizza</Text>
-            </View>
+            <Text>{restaurant?.rating} (200+ ratings) · </Text>
+            <Text>{restaurant?.type}</Text>
           </View>
-          <View>
-            <Text style={{ color: "grey" }}>Open until 3:30am</Text>
-          </View>
-          <View>
-            <Text>{restaurant?.description} json.details</Text>
+          <Text>{restaurant?.description}</Text>
+          <Text style={{ color: "#666666", paddingBottom: 20 }}>
+            Open until 3:30am
+          </Text>
+
+          <View
+            style={{
+              width: "100%",
+              backgroundColor: "#FF9D9D",
+              height: 30,
+              justifyContent: "center",
+              paddingLeft: 10,
+            }}
+          >
+            <Text>30% discount for all</Text>
           </View>
         </View>
       </View>
@@ -198,8 +192,7 @@ export default function RestaurantScreen({ route, navigation }) {
           style={{
             fontWeight: "bold",
             fontSize: 30,
-            marginLeft: 15,
-            marginBottom: 15,
+            paddingLeft: SIZES.padding * 2,
           }}
         >
           Picked for you
@@ -258,10 +251,7 @@ export default function RestaurantScreen({ route, navigation }) {
   }
 
   return (
-    <SafeAreaView
-      style={styles.container}
-      showsHorizontalScrollIndicator={false}
-    >
+    <View style={styles.container} showsHorizontalScrollIndicator={false}>
       <View>
         {renderHeader()}
         {imageHeader()}
@@ -271,7 +261,7 @@ export default function RestaurantScreen({ route, navigation }) {
       </View>
 
       {menuCart()}
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -279,11 +269,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.lightGray2,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+  },
+  body: {
+    paddingTop: 5,
+    paddingLeft: SIZES.padding * 2,
+    paddingRight: SIZES.padding * 2,
+    paddingBottom: 15,
   },
   menus: {
     flexDirection: "row",
-    marginLeft: 15,
-    marginBottom: 20,
+    paddingLeft: SIZES.padding * 2,
+    marginBottom: 10, // size between cards
   },
 });

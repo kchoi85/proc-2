@@ -28,7 +28,7 @@ export default function RegisterScreen({ navigation }) {
     (state) => state.userReducer
   );
 
-  useSelector((state) => console.log(state.userReducer));
+  // {DEBUG} useSelector((state) => console.log(state.userReducer));
 
   // if user registers successfully, userLoggedin == true.
   // since this code is re-run, we check if userLoggedin==true
@@ -148,9 +148,8 @@ export default function RegisterScreen({ navigation }) {
               }
             }}
             placeholder="Password"
-            autoCompleteType={"off"}
-            autoCorrect={"false"}
-            secureTextEntry={"true"}
+            secureTextEntry={true}
+            autoCapitalize="none"
           />
           <TextInput
             style={styles.creds}
@@ -165,9 +164,8 @@ export default function RegisterScreen({ navigation }) {
               }
             }}
             placeholder="Confirm Password"
-            autoCompleteType={"off"}
-            autoCorrect={"false"}
-            secureTextEntry={"true"}
+            secureTextEntry={true}
+            autoCapitalize="none"
           />
         </View>
 
@@ -182,7 +180,7 @@ export default function RegisterScreen({ navigation }) {
               backgroundColor: "black",
               justifyContent: "center",
               alignItems: "center",
-              marginTop: 20,
+              marginTop: 10,
             }}
             onPress={() => {
               // if passMatch (which should be null if pass === passCnfrm) is not null

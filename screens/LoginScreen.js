@@ -118,15 +118,16 @@ export default function LoginScreen({ navigation }) {
             style={styles.creds}
             onChangeText={setPass}
             placeholder="Password"
-            autoCompleteType={"off"}
-            autoCorrect={"false"}
-            secureTextEntry={"true"}
+            // autoCompleteType={"off"}
+            // autoCorrect={"false"}
+            secureTextEntry={true}
+            autoCapitalize="none"
           />
         </View>
 
         <View style={{ flexDirection: "row" }}>
           <TouchableOpacity
-            style={styles.button}
+            style={styles.buttonLogin}
             onPress={() => {
               onUserLogin({ email: id, password: pass });
 
@@ -139,7 +140,7 @@ export default function LoginScreen({ navigation }) {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.button}
+            style={styles.buttonRegister}
             onPress={() => navigation.navigate("RegisterScreen")}
           >
             <Text style={{ color: "#FFF" }}>Register</Text>
@@ -186,7 +187,15 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     color: "grey",
   },
-  button: {
+  buttonLogin: {
+    height: 30,
+    width: 110,
+    backgroundColor: "black",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  buttonRegister: {
     height: 30,
     width: 110,
     backgroundColor: "black",
