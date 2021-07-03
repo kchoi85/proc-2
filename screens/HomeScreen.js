@@ -8,14 +8,17 @@ import {
   StatusBar,
   TouchableOpacity,
   Image,
-  ImageBackground,
+  TextInput,
   FlatList,
   ScrollView,
   LogBox,
+  Modal,
+  Pressable,
 } from "react-native";
 import { store } from "../redux";
 import { useSelector } from "react-redux";
 import { EXPRESS_SERVER } from "@env";
+import axios from "axios";
 
 import { icons, images, SIZES, COLORS, FONTS } from "../constants";
 
@@ -24,9 +27,23 @@ export default function HomeScreen({ navigation }) {
   //const [isLoading, setLoading] = useState(true);
   const [restaurantsArr, setRestaurants] = useState([]);
 
-  var { favRes } = useSelector((state) => state.userReducer);
+  var { openedFirstTime } = useSelector((state) => state.userReducer);
+  const [initialSetup, setInitialSetup] = React.useState(openedFirstTime);
+  const [actionPressed, setActionPressed] = useState(false);
+
+  const [signinButton, setSignin] = React.useState(false);
+
+  const [fName, setFName] = React.useState(null);
+  const [lName, setLName] = React.useState(null);
+  const [email, setEmail] = React.useState(null);
+  const [phone, setPhone] = React.useState(null);
+  const [password, setPassword] = React.useState(null);
+
+  const { userLoggedIn } = useSelector((state) => state.userReducer);
+  const [loggedin, setLoggedin] = React.useState(false);
 
   useEffect(() => {
+    setLoggedin(userLoggedIn);
     LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
     fetch(`${EXPRESS_SERVER}/restaurants/getRestaurants`, {
       method: "GET",
@@ -38,7 +55,398 @@ export default function HomeScreen({ navigation }) {
       .then((json) => setRestaurants(json.restaurants))
       .catch((error) => console.error(error));
     //.finally(() => setLoading(false));
-  }, []);
+  }, [userLoggedIn]);
+
+  const onUserLogin = async ({ email, password }) => {
+    const response = await axios.post(`${EXPRESS_SERVER}/users/loginUser`, {
+      email,
+      password,
+    });
+    store.dispatch({ type: "DO_LOGIN", payload: response.data });
+  };
+
+  const onUserRegister = async ({ email, name, password, phone }) => {
+    try {
+      const response = await axios.post(
+        `${EXPRESS_SERVER}/users/registerUser`,
+        {
+          email,
+          name,
+          password,
+          phone,
+        }
+      );
+      store.dispatch({ type: "DO_REGISTER", payload: response.data });
+    } catch (error) {
+      store.dispatch({ type: "ON_ERROR", payload: error });
+    }
+  };
+
+  function renderModal() {
+    return (
+      <View>
+        <Modal animationType="fade" transparent={false} visible={initialSetup}>
+          {actionPressed === true ? (
+            loggedin === true ? (
+              <View>
+                <TouchableOpacity
+                  onPress={() => store.dispatch({ type: "DEV_RESET" })}
+                >
+                  <Text>RESET</Text>
+                </TouchableOpacity>
+              </View>
+            ) : signinButton === true ? (
+              <View style={styles.modal2}>
+                {/* ========Header========= */}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-evenly",
+                  }}
+                >
+                  <TouchableOpacity onPress={() => setSignin(false)}>
+                    <View
+                      style={{
+                        backgroundColor: "white",
+                        borderRadius: 30,
+                        width: 100,
+                        height: 40,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontWeight: "bold",
+                          fontSize: 20,
+                          color: "black",
+                          textAlign: "center",
+                        }}
+                      >
+                        Sign Up
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  <View
+                    style={{
+                      backgroundColor: "#FF5353",
+                      borderRadius: 30,
+                      width: 100,
+                      height: 40,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: 20,
+                        color: "white",
+                        textAlign: "center",
+                      }}
+                    >
+                      Sign In
+                    </Text>
+                  </View>
+                </View>
+                {/* ========Sign Up Body (First and Last Name) ========= */}
+                <View style={styles.modal2Body}>
+                  {/* ========Sign Up Body (Email) ========= */}
+                  <View>
+                    <Text style={{ fontWeight: "bold", paddingBottom: 5 }}>
+                      Email
+                    </Text>
+                    <TextInput
+                      style={styles.modal2Input}
+                      placeholder="Elena.Sim@gmail.com"
+                      onChangeText={(text) => setEmail(text)}
+                    />
+                  </View>
+                  {/* ========Sign Up Body (Password) ========= */}
+                  <View style={{ paddingTop: 20 }}>
+                    <Text style={{ fontWeight: "bold", paddingBottom: 5 }}>
+                      Password
+                    </Text>
+                    <TextInput
+                      style={styles.modal2Input}
+                      placeholder="**********"
+                      secureTextEntry={true}
+                      onChangeText={(text) => setPassword(text)}
+                    />
+                  </View>
+                </View>
+                {/* =========Sign In Button=========*/}
+                <View style={styles.modal2Signin}>
+                  <TouchableOpacity
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                    onPress={() => {
+                      onUserLogin({ email, password });
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        color: "white",
+                        fontSize: 18,
+                      }}
+                    >
+                      Sign In
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.modal2}>
+                {/* ========Header========= */}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-evenly",
+                  }}
+                >
+                  <View
+                    style={{
+                      backgroundColor: "#FF5353",
+                      borderRadius: 30,
+                      width: 100,
+                      height: 40,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: 20,
+                        color: "white",
+                        textAlign: "center",
+                      }}
+                    >
+                      Sign Up
+                    </Text>
+                  </View>
+                  <TouchableOpacity onPress={() => setSignin(true)}>
+                    <View
+                      style={{
+                        backgroundColor: "white",
+                        borderRadius: 30,
+                        width: 100,
+                        height: 40,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontWeight: "bold",
+                          fontSize: 20,
+                          color: "black",
+                          textAlign: "center",
+                        }}
+                      >
+                        Sign In
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+                {/* ========Sign Up Body (First and Last Name) ========= */}
+                <View style={styles.modal2Body}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      paddingBottom: 20,
+                    }}
+                  >
+                    <View style={{ width: "48%" }}>
+                      <Text
+                        style={{
+                          fontWeight: "bold",
+                          paddingBottom: 5,
+                        }}
+                      >
+                        First Name
+                      </Text>
+                      <TextInput
+                        style={styles.modal2Input}
+                        placeholder="Elena"
+                        onChangeText={(text) => setFName(text)}
+                      />
+                    </View>
+                    <View style={{ width: "48%" }}>
+                      <Text style={{ fontWeight: "bold", paddingBottom: 5 }}>
+                        Last Name
+                      </Text>
+                      <TextInput
+                        style={styles.modal2Input}
+                        placeholder="Sim"
+                        onChangeText={(text) => setLName(text)}
+                      />
+                    </View>
+                  </View>
+                  {/* ========Sign Up Body (Email) ========= */}
+                  <View>
+                    <Text style={{ fontWeight: "bold", paddingBottom: 5 }}>
+                      Email
+                    </Text>
+                    <TextInput
+                      style={styles.modal2Input}
+                      placeholder="Elena.Sim@gmail.com"
+                      onChangeText={(text) => setEmail(text)}
+                    />
+                  </View>
+                  {/* ========Sign Up Body (Phone) ========= */}
+                  <View style={{ paddingTop: 20 }}>
+                    <Text style={{ fontWeight: "bold", paddingBottom: 5 }}>
+                      Phone Number
+                    </Text>
+                    <TextInput
+                      style={styles.modal2Input}
+                      placeholder="123-456-7890"
+                      keyboardType="numeric"
+                      onChangeText={(text) => setPhone(text)}
+                    />
+                  </View>
+                  {/* ========Sign Up Body (Password) ========= */}
+                  <View style={{ paddingTop: 20 }}>
+                    <Text style={{ fontWeight: "bold", paddingBottom: 5 }}>
+                      Password
+                    </Text>
+                    <TextInput
+                      style={styles.modal2Input}
+                      placeholder="**********"
+                      secureTextEntry={true}
+                      onChangeText={(text) => setPassword(text)}
+                    />
+                  </View>
+                </View>
+                {/* =========Sign Up Button=========*/}
+                <View style={styles.modal2Signin}>
+                  <TouchableOpacity
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                    onPress={() => {
+                      onUserRegister({
+                        email: email,
+                        name: fName,
+                        password: password,
+                        phone: phone,
+                      });
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        color: "white",
+                        fontSize: 18,
+                      }}
+                    >
+                      Sign Up
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )
+          ) : (
+            <View style={styles.modal}>
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: "63%",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 28,
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Welcome to DeliveryTO!
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 17,
+                    color: "black",
+                    textAlign: "center",
+                    paddingTop: 5,
+                    paddingLeft: 50,
+                    paddingRight: 50,
+                    lineHeight: 23,
+                  }}
+                >
+                  Let's help local restaurants get back to business
+                </Text>
+              </View>
+              <Image
+                source={images.main_icon}
+                style={{
+                  height: 200,
+                  width: 250,
+                  position: "absolute",
+                  bottom: "28%",
+                }}
+              />
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: "18%",
+                  backgroundColor: "#FF5353",
+                  borderRadius: 30,
+                  height: 50,
+                  width: "90%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Pressable
+                  style={{
+                    width: "100%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  onPress={() => {
+                    setActionPressed(true);
+                    // setInitialSetup(!initialSetup);
+                    // store.dispatch({ type: "DO_INITIAL_APP_REGISTER" });
+                  }}
+                >
+                  <Text
+                    style={{ fontWeight: "bold", color: "white", fontSize: 18 }}
+                  >
+                    Let's order some food
+                  </Text>
+                </Pressable>
+              </View>
+              <View style={{ position: "absolute", bottom: "8%" }}>
+                <Text
+                  style={{
+                    color: "gray",
+                    textAlign: "center",
+                    lineHeight: 20,
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                  }}
+                >
+                  By pressing Register or Sign up, you agree to our Terms and
+                  Conditions and Privacy Statement
+                </Text>
+              </View>
+            </View>
+          )}
+        </Modal>
+      </View>
+    );
+  }
 
   function renderHeader() {
     return (
@@ -392,6 +800,7 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
+      {renderModal()}
       {renderHeader()}
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -410,6 +819,35 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.lightGray4,
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 10,
+  },
+  modal: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "space-evenly",
+    paddingLeft: SIZES.padding * 2,
+    paddingRight: SIZES.padding * 2,
+    backgroundColor: "white",
+  },
+  modal2: {
+    paddingTop: 40,
+    paddingLeft: SIZES.padding * 2,
+    paddingRight: SIZES.padding * 2,
+  },
+  modal2Body: { paddingTop: 30 },
+  modal2Input: {
+    height: 50,
+    paddingLeft: 20,
+    fontWeight: "bold",
+    backgroundColor: "#ededed",
+    borderRadius: 10,
+  },
+  modal2Signin: {
+    marginTop: 40,
+    backgroundColor: "#FF5353",
+    borderRadius: 30,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
   },
   header: {
     flexDirection: "row",

@@ -13,6 +13,7 @@ import { persistStore, persistReducer } from "redux-persist";
 
 const INITIAL_STATE = {
   userLoggedIn: false,
+  openedFirstTime: true,
   user: {},
   menu: [],
   favRes: [],
@@ -21,6 +22,11 @@ const INITIAL_STATE = {
 // reducers
 const userReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
+    case "DO_INITIAL_APP_REGISTER":
+      return {
+        ...state,
+        openedFirstTime: false,
+      };
     case "DO_LOGIN":
       return {
         ...state,
@@ -81,6 +87,7 @@ const userReducer = (state = INITIAL_STATE, action) => {
     case "DEV_RESET":
       return {
         userLoggedIn: false,
+        openedFirstTime: true,
         user: {},
         menu: [],
         favRes: [],
