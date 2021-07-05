@@ -26,6 +26,11 @@ const userReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         openedFirstTime: false,
+
+        location: action.payload.location,
+        address: action.payload.address,
+        subaddress: action.payload.subaddress,
+        deliveryInst: action.payload.deliveryInst,
       };
     case "DO_LOGIN":
       return {
