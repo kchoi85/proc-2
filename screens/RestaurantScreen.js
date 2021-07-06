@@ -19,6 +19,7 @@ import {
 import { icons, COLORS, SIZES, FONTS, images } from "../constants";
 import { store } from "../redux";
 import { useSelector } from "react-redux";
+import { EXPRESS_SERVER, GOOGLE_MAPS_API } from "@env";
 
 export default function RestaurantScreen({ route, navigation }) {
   const [restaurant, setRestaurant] = React.useState(null);
@@ -36,7 +37,7 @@ export default function RestaurantScreen({ route, navigation }) {
     return (
       <ImageBackground
         source={{
-          uri: `http://192.168.2.12:4000/${restaurant?.resBanner}`,
+          uri: `${EXPRESS_SERVER}/${restaurant?.resBanner}`,
         }}
         style={{
           width: "100%",
@@ -226,7 +227,8 @@ export default function RestaurantScreen({ route, navigation }) {
         <View
           style={{
             position: "absolute",
-            top: screenHeight * 0.915,
+            paddingHorizontal: SIZES.padding * 8,
+            bottom: 20,
           }}
         >
           <TouchableOpacity
@@ -235,6 +237,7 @@ export default function RestaurantScreen({ route, navigation }) {
               justifyContent: "center",
               backgroundColor: COLORS.black,
               height: 50,
+              borderRadius: 30,
               paddingHorizontal: SIZES.padding * 7,
             }}
             onPress={() => {

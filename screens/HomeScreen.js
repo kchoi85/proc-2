@@ -13,6 +13,9 @@ import {
   ScrollView,
   LogBox,
   Modal,
+  ActivityIndicator,
+  Dimensions,
+  Alert,
 } from "react-native";
 import { store } from "../redux";
 import { useSelector } from "react-redux";
@@ -26,10 +29,12 @@ import { icons, images, SIZES, COLORS, FONTS } from "../constants";
 
 export default function HomeScreen({ navigation }) {
   // console.log(useSelector((state) => state.userReducer));
-  //const [isLoading, setLoading] = useState(true);
   const [restaurantsArr, setRestaurants] = useState([]);
 
-  var { openedFirstTime } = useSelector((state) => state.userReducer);
+  var { openedFirstTime, userLoggedIn, address } = useSelector(
+    (state) => state.userReducer
+  );
+
   const [initialSetup, setInitialSetup] = React.useState(openedFirstTime);
   const [actionPressed, setActionPressed] = useState(false);
 
@@ -41,7 +46,6 @@ export default function HomeScreen({ navigation }) {
   const [phone, setPhone] = React.useState(null);
   const [password, setPassword] = React.useState(null);
 
-  const { userLoggedIn } = useSelector((state) => state.userReducer);
   const [loggedin, setLoggedin] = React.useState(false);
 
   const [errorMsg, setErrorMsg] = React.useState(null);
@@ -50,27 +54,16 @@ export default function HomeScreen({ navigation }) {
   const [longitude, setLongitude] = React.useState(null);
   const [marker, setMarker] = React.useState(null);
 
-  const [locationShared, setShareLocation] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(null);
+  const [locationShared, setShareLocation] = React.useState(false); //for modal
 
   const [addressText, setAddressText] = React.useState("");
   const [unitText, setUnitText] = React.useState(null);
   const [deliveryInst, setDeliveryInst] = React.useState(null);
 
-  const { address } = useSelector((state) => state.userReducer);
-
   useEffect(() => {
     setLoggedin(userLoggedIn);
-    if (location) {
-      let marker = (
-        <Marker
-          coordinate={{
-            latitude: latitude,
-            longitude: longitude,
-          }}
-        />
-      );
-      setMarker(marker);
-    }
+
     LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
     fetch(`${EXPRESS_SERVER}/restaurants/getRestaurants`, {
       method: "GET",
@@ -84,12 +77,21 @@ export default function HomeScreen({ navigation }) {
     //.finally(() => setLoading(false));
   }, [userLoggedIn, location, longitude]); //
 
+  const loading = (
+    <View>
+      <ActivityIndicator color={"#fff"} size="large" />
+    </View>
+  );
+
   const onUserLogin = async ({ email, password }) => {
+    setIsLoading(loading);
     const response = await axios.post(`${EXPRESS_SERVER}/users/loginUser`, {
       email,
       password,
     });
     store.dispatch({ type: "DO_LOGIN", payload: response.data });
+
+    setIsLoading(null);
   };
 
   const onUserRegister = async ({ email, name, password, phone }) => {
@@ -109,17 +111,27 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
+  const showLoading = async () => {
+    setIsLoading(loading);
+    await onUserLocation();
+    setIsLoading(null);
+  };
+
   const onUserLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
       setErrorMsg("Permission to access location was denied");
     }
-    let location = await Location.getCurrentPositionAsync({
+    let locationR = await Location.getCurrentPositionAsync({
       // accuracy: Location.Accuracy.Highest,
     });
-    setLocation(location);
-    setLatitude(location.coords.latitude);
-    setLongitude(location.coords.longitude);
+
+    if (locationR) {
+      setLocation(locationR);
+      setLatitude(locationR.coords.latitude);
+      setLongitude(locationR.coords.longitude);
+      setShareLocation(true);
+    }
   };
 
   // const onGeolocation = async ({ lat, lng }) => {
@@ -141,6 +153,18 @@ export default function HomeScreen({ navigation }) {
         show enterLocation-modal)
         :(show shareLocation-modal))
     :(show signin/up-modal)  
+  :show welcome-modal) 
+: null}
+
+{openedFirstTime === true ? 
+  actionPressed === true ? 
+    (loggedin === true ? 
+      (locationShared === true ? 
+        (show enterLocation-modal)
+        :(show shareLocation-modal))
+    :forgotPassword === true ?
+      show enterEmail-modal
+      : (show signin/up-modal) 
   :show welcome-modal) 
 : null}
 
@@ -168,7 +192,7 @@ export default function HomeScreen({ navigation }) {
                     >
                       Enter Your Address
                     </Text>
-                    <View style={{ paddingTop: 20 }}>
+                    <View style={{ paddingTop: 10 }}>
                       <View style={styles.modal4Input}>
                         <Image
                           source={icons.search}
@@ -200,6 +224,12 @@ export default function HomeScreen({ navigation }) {
                       }}
                     >
                       {/* {marker} */}
+                      <Marker
+                        coordinate={{
+                          latitude,
+                          longitude,
+                        }}
+                      />
                     </MapView>
                     <View
                       style={{
@@ -246,7 +276,7 @@ export default function HomeScreen({ navigation }) {
                         />
                       </View>
                     </View>
-                    <View style={{ paddingTop: 40, paddingBottom: 100 }}>
+                    <View style={{ paddingTop: 20 }}>
                       <Text
                         style={{
                           fontWeight: "bold",
@@ -272,21 +302,39 @@ export default function HomeScreen({ navigation }) {
                         onChangeText={(text) => setDeliveryInst(text)}
                       />
                     </View>
-                    <View
+
+                    <TouchableOpacity
                       style={{
-                        backgroundColor: "#FF5353",
-                        borderRadius: 30,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "#ff5353",
+                        width: "100%",
                         height: 50,
+                        borderRadius: 30,
+                        marginTop: Dimensions.get("window").height * 0.05,
                       }}
-                    >
-                      <TouchableOpacity
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                        onPress={() => {
+                      onPress={() => {
+                        if (!addressText) {
+                          Alert.alert(
+                            "Before submission",
+                            "Please specify your address!",
+                            [
+                              {
+                                text: "OK",
+                              },
+                            ]
+                          );
+                        } else if (!unitText) {
+                          Alert.alert(
+                            "Before submission",
+                            "Please specify your Apt/Suite Number!",
+                            [
+                              {
+                                text: "OK",
+                              },
+                            ]
+                          );
+                        } else {
                           store.dispatch({
                             type: "DO_INITIAL_APP_REGISTER",
                             payload: {
@@ -297,71 +345,72 @@ export default function HomeScreen({ navigation }) {
                             },
                           });
                           setInitialSetup(false);
-                        }}
-                      >
-                        <Text
-                          style={{
-                            fontWeight: "bold",
-                            color: "white",
-                            fontSize: 18,
-                          }}
-                        >
-                          Submit
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </ScrollView>
-                ) : (
-                  <View style={styles.modal3}>
-                    <View style={{ position: "absolute", bottom: "18%" }}>
-                      <Image
-                        source={images.main_location}
-                        style={{
-                          width: "100%",
-                          height: 300,
-                        }}
-                      />
+                        }
+                      }}
+                    >
                       <Text
                         style={{
                           fontWeight: "bold",
-                          fontSize: 30,
-                          textAlign: "center",
-                          paddingTop: 10,
-                          color: "black",
+                          color: "white",
+                          fontSize: 18,
                         }}
                       >
-                        Deliver to the your address
+                        Submit
                       </Text>
-                      <Text
-                        style={{
-                          fontSize: 16,
-                          textAlign: "center",
-                          paddingTop: 10,
-                          paddingLeft: 25,
-                          paddingRight: 25,
-                          lineHeight: 20,
-                          color: "#808080",
-                          paddingBottom: 90, // padding between 'We need' and sharelocation button
-                        }}
-                      >
-                        We need your location permission to ensure your delivery
-                        arrives to wherever you want it
-                      </Text>
-                      <TouchableOpacity
-                        style={{
-                          width: "100%",
-                          height: 50,
-                          borderRadius: 30,
-                          backgroundColor: "#FF5353",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                        onPress={() => {
-                          onUserLocation();
-
-                          setShareLocation(true);
-                        }}
-                      >
+                    </TouchableOpacity>
+                  </ScrollView>
+                ) : (
+                  <View style={styles.modal3}>
+                    <Image
+                      source={images.main_location}
+                      style={{
+                        width: "100%",
+                        height: 300,
+                      }}
+                    />
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: 30,
+                        textAlign: "center",
+                        paddingTop: 10,
+                        color: "black",
+                      }}
+                    >
+                      Deliver to the your address
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        textAlign: "center",
+                        paddingTop: 10,
+                        paddingLeft: 25,
+                        paddingRight: 25,
+                        lineHeight: 20,
+                        color: "#808080",
+                        paddingBottom: 90, // padding between 'We need' and sharelocation button
+                      }}
+                    >
+                      We need your location permission to ensure your delivery
+                      arrives to wherever you want it
+                    </Text>
+                    <TouchableOpacity
+                      style={{
+                        width: "100%",
+                        height: 50,
+                        borderRadius: 30,
+                        backgroundColor: "#FF5353",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                      onPress={() => {
+                        showLoading();
+                        // onUserLocation();
+                      }}
+                    >
+                      {isLoading ? (
+                        <View>{isLoading}</View>
+                      ) : (
                         <Text
                           style={{
                             color: "white",
@@ -371,8 +420,8 @@ export default function HomeScreen({ navigation }) {
                         >
                           Share Location
                         </Text>
-                      </TouchableOpacity>
-                    </View>
+                      )}
+                    </TouchableOpacity>
                   </View>
                 )
               ) : signinButton === true ? (
@@ -466,18 +515,30 @@ export default function HomeScreen({ navigation }) {
                         justifyContent: "center",
                       }}
                       onPress={() => {
-                        onUserLogin({ email, password });
+                        if (!email || !password) {
+                          Alert.alert(
+                            "Before login",
+                            "Please fill all required fields",
+                            [{ text: "Ok" }]
+                          );
+                        } else {
+                          onUserLogin({ email, password });
+                        }
                       }}
                     >
-                      <Text
-                        style={{
-                          fontWeight: "bold",
-                          color: "white",
-                          fontSize: 18,
-                        }}
-                      >
-                        Sign In
-                      </Text>
+                      {isLoading ? (
+                        <View>{isLoading}</View>
+                      ) : (
+                        <Text
+                          style={{
+                            fontWeight: "bold",
+                            color: "white",
+                            fontSize: 18,
+                          }}
+                        >
+                          Sign In
+                        </Text>
+                      )}
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -607,34 +668,53 @@ export default function HomeScreen({ navigation }) {
                       />
                     </View>
                   </View>
+                  {errorMsg ? (
+                    <Text style={styles.errormsg}>{errorMsg}</Text>
+                  ) : null}
                   {/* =========Sign Up Button=========*/}
                   <View style={styles.modal2Signin}>
-                    <TouchableOpacity
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                      onPress={() => {
-                        onUserRegister({
-                          email: email,
-                          name: fName,
-                          password: password,
-                          phone: phone,
-                        });
-                      }}
-                    >
-                      <Text
+                    <View>
+                      <TouchableOpacity
                         style={{
-                          fontWeight: "bold",
-                          color: "white",
-                          fontSize: 18,
+                          width: "100%",
+                          height: "100%",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                        onPress={() => {
+                          if (
+                            !fName ||
+                            !lName ||
+                            !email ||
+                            !phone ||
+                            !password
+                          ) {
+                            Alert.alert(
+                              "Before registration",
+                              "Please fill all required fields!",
+                              [{ text: "Ok" }]
+                            );
+                          } else {
+                            onUserRegister({
+                              email: email,
+                              name: fName,
+                              password: password,
+                              phone: phone,
+                            });
+                          }
                         }}
                       >
-                        Sign Up
-                      </Text>
-                    </TouchableOpacity>
+                        <Text
+                          style={{
+                            fontWeight: "bold",
+                            color: "white",
+                            fontSize: 18,
+                          }}
+                        >
+                          Sign Up
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
               )
@@ -643,12 +723,12 @@ export default function HomeScreen({ navigation }) {
                 <View
                   style={{
                     position: "absolute",
-                    bottom: "63%",
+                    bottom: "68%",
                   }}
                 >
                   <Text
                     style={{
-                      fontSize: 28,
+                      fontSize: 30,
                       fontWeight: "bold",
                       textAlign: "center",
                     }}
@@ -672,16 +752,16 @@ export default function HomeScreen({ navigation }) {
                 <Image
                   source={images.main_icon}
                   style={{
-                    height: 200,
-                    width: 250,
+                    height: Dimensions.get("window").height * 0.35,
+                    width: Dimensions.get("window").width,
                     position: "absolute",
-                    bottom: "28%",
+                    bottom: "25%",
                   }}
                 />
                 <View
                   style={{
                     position: "absolute",
-                    bottom: "18%",
+                    bottom: "15%",
                     backgroundColor: "#FF5353",
                     borderRadius: 30,
                     height: 50,
@@ -714,7 +794,7 @@ export default function HomeScreen({ navigation }) {
                     </Text>
                   </TouchableOpacity>
                 </View>
-                <View style={{ position: "absolute", bottom: "9%" }}>
+                <View style={{ position: "absolute", bottom: "8%" }}>
                   <Text
                     style={{
                       color: "gray",
@@ -1115,7 +1195,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   modal2: {
-    paddingTop: 40,
+    paddingTop: Dimensions.get("window").height * 0.05,
     paddingLeft: SIZES.padding * 2,
     paddingRight: SIZES.padding * 2,
   },
@@ -1135,16 +1215,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  errormsg: {
+    paddingTop: 5,
+    fontWeight: "bold",
+    color: "red",
+  },
   modal3: {
     flex: 1,
-    paddingTop: 40,
     paddingLeft: SIZES.padding * 2,
     paddingRight: SIZES.padding * 2,
-    alignItems: "center",
+    alignContent: "center",
+    justifyContent: "center",
   },
   modal4: {
     flex: 1,
-    paddingTop: 40,
+    paddingTop: Dimensions.get("window").height * 0.05,
+
     paddingLeft: SIZES.padding * 2,
     paddingRight: SIZES.padding * 2,
   },
@@ -1152,15 +1238,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingLeft: 15,
-    height: 50,
+    height: Dimensions.get("window").height * 0.06,
     width: "100%",
     borderRadius: 10,
     backgroundColor: "#f2f2f2",
   },
   modal4Map: {
     width: "100%",
-    height: 200,
-    marginTop: 20,
+    height: Dimensions.get("window").height * 0.25,
+    marginTop: 10,
     borderRadius: 20,
   },
 

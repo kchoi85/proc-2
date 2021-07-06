@@ -15,6 +15,8 @@ import { useSelector } from "react-redux";
 
 import { store } from "../redux/index";
 import axios from "axios";
+import { EXPRESS_SERVER, GOOGLE_MAPS_API } from "@env";
+
 
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = React.useState(null);
@@ -98,7 +100,7 @@ export default function RegisterScreen({ navigation }) {
   const onUserRegister = async ({ email, name, password, phone, address }) => {
     try {
       const response = await axios.post(
-        "http://192.168.2.12:4000/users/registerUser",
+        `${EXPRESS_SERVER}/users/registerUser`,
         {
           email,
           name,

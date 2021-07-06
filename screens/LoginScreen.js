@@ -11,6 +11,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useSelector } from "react-redux";
+import { EXPRESS_SERVER, GOOGLE_MAPS_API } from "@env";
 
 import { icons, COLORS, SIZES, FONTS, images } from "../constants";
 
@@ -93,7 +94,7 @@ export default function LoginScreen({ navigation }) {
   const onUserLogin = async ({ email, password }) => {
     try {
       const response = await axios.post(
-        "http://192.168.2.12:4000/users/loginUser",
+        `${EXPRESS_SERVER}/users/loginUser`,
         {
           email,
           password,

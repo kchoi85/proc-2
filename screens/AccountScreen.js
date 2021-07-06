@@ -17,6 +17,7 @@ import { useSelector } from "react-redux";
 
 export default function AccountScreen({ navigation }) {
   const { userLoggedIn, user } = useSelector((state) => state.userReducer);
+  useSelector((state) => console.log(state));
 
   function renderHeader() {
     return (

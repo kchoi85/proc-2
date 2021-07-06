@@ -11,6 +11,7 @@ import {
   FlatList,
   ImageBackground,
   TextInput,
+  Dimensions,
 } from "react-native";
 
 // import { isIphoneX } from "react-native-iphone-x-helper";
@@ -90,7 +91,7 @@ export default function ItemScreen({ route, navigation }) {
         source={images.pizza_restaurant}
         style={{
           width: "100%",
-          height: 250,
+          height: Dimensions.get("window").height * 0.2,
           marginTop: StatusBar.currentHeight,
         }}
       >
@@ -194,7 +195,7 @@ export default function ItemScreen({ route, navigation }) {
         <View
           style={{
             position: "absolute",
-            bottom: "10%",
+            bottom: "3%",
             width: SIZES.width,
             height: 60,
             justifyContent: "center",
@@ -268,11 +269,8 @@ export default function ItemScreen({ route, navigation }) {
             justifyContent: "center",
             alignItems: "center",
             backgroundColor: COLORS.black,
-            borderTopLeftRadius: 30,
-            borderTopRightRadius: 30,
-            borderBottomLeftRadius: 30,
-            borderBottomRightRadius: 30,
-            height: "120%",
+            borderRadius: 30,
+            height: 50,
             width: "80%",
           }}
           onPress={() => addToCart(_id, item, price, itemCount)}

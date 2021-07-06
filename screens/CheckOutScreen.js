@@ -16,6 +16,7 @@ import {
 import { icons, COLORS, SIZES, FONTS, images } from "../constants";
 import { useSelector } from "react-redux";
 import { store } from "../redux";
+import { EXPRESS_SERVER, GOOGLE_MAPS_API } from "@env";
 
 export default function CheckOutScreen({ route, navigation }) {
   const [items, setItems] = React.useState([]);
@@ -158,7 +159,7 @@ export default function CheckOutScreen({ route, navigation }) {
     };
     store.dispatch({ type: "SUBMIT_ORDER" });
     navigation.goBack();
-    return fetch("http://192.168.2.12:4000/orders/submitOrder", data)
+    return fetch(`${EXPRESS_SERVER}/orders/submitOrder`, data)
       .then((response) => response.json())
       .then((responseJson) => console.log(responseJson))
       .catch((error) => console.log(error));
