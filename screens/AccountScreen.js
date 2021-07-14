@@ -87,13 +87,13 @@ export default function AccountScreen({ navigation }) {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.button}>
+          {/* <View style={styles.button}>
             <TouchableOpacity
               onPress={() => navigation.navigate("WalletScreen")}
             >
               <Text>Wallet</Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
 
           <View style={styles.button}>
             <TouchableOpacity onPress={() => navigation.navigate("HelpScreen")}>

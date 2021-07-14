@@ -14,10 +14,11 @@ import {
 } from "react-native";
 import { icons, COLORS, SIZES, FONTS, images } from "../constants";
 import { store } from "../redux";
+import { useSelector } from "react-redux";
 
 export default function AccSettingsScreen({ navigation, route }) {
   let { user } = route.params;
-  // fullname, message, token, _id
+  let { address } = useSelector((state) => state.userReducer);
 
   function renderHeader() {
     return (
@@ -78,15 +79,15 @@ export default function AccSettingsScreen({ navigation, route }) {
   function userInfo() {
     return (
       <View style={styles.body}>
-        <View>
-          <Text>User ID: {user._id}</Text>
-        </View>
-        <View>
-          <Text>Full name: {user.fullname}</Text>
-        </View>
-        <View>
-          <Text>Token: {user.token}</Text>
-        </View>
+        <Text>User ID: {user._id}</Text>
+
+        <Text>Full name: {user.fullname}</Text>
+        <Text>Email: {user.email}</Text>
+        <Text>Phone: {user.phone}</Text>
+        <Text>Address: {address}</Text>
+
+        <Text>Token: {user.token}</Text>
+
         <TouchableOpacity
           style={styles.logOutButton}
           onPress={() => {

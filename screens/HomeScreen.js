@@ -31,9 +31,16 @@ export default function HomeScreen({ navigation }) {
   // console.log(useSelector((state) => state.userReducer));
   const [restaurantsArr, setRestaurants] = useState([]);
 
-  var { openedFirstTime, userLoggedIn, address } = useSelector(
-    (state) => state.userReducer
-  );
+  var {
+    openedFirstTime, // boolean
+    userLoggedIn, //boolean
+    address, // 18 Yonge St
+    locationObj, // object
+    subaddress, // Unit 812
+    deliveryInstruction, // delivery instructions
+  } = useSelector((state) => state.userReducer);
+
+  useSelector((state) => console.log(state.userReducer));
 
   const [initialSetup, setInitialSetup] = React.useState(openedFirstTime);
   const [actionPressed, setActionPressed] = useState(false);
@@ -89,13 +96,13 @@ export default function HomeScreen({ navigation }) {
       email,
       password,
     });
-    store.dispatch({ type: "DO_LOGIN", payload: response.data });
-
+    store.dispatch({ type: "DO_LOGIN_FROM_MODAL", payload: response.data });
     setIsLoading(null);
   };
 
   const onUserRegister = async ({ email, name, password, phone }) => {
     try {
+      setIsLoading(loading);
       const response = await axios.post(
         `${EXPRESS_SERVER}/users/registerUser`,
         {
@@ -105,7 +112,11 @@ export default function HomeScreen({ navigation }) {
           phone,
         }
       );
-      store.dispatch({ type: "DO_REGISTER", payload: response.data });
+      store.dispatch({
+        type: "DO_REGISTER_FROM_MODAL",
+        payload: response.data,
+      });
+      setIsLoading(null);
     } catch (error) {
       store.dispatch({ type: "ON_ERROR", payload: error });
     }
@@ -338,10 +349,10 @@ export default function HomeScreen({ navigation }) {
                           store.dispatch({
                             type: "DO_INITIAL_APP_REGISTER",
                             payload: {
-                              location: location,
+                              locationObj: location,
                               address: addressText,
                               subaddress: unitText,
-                              deliveryInst: deliveryInst,
+                              deliveryInstruction: deliveryInst,
                             },
                           });
                           setInitialSetup(false);
@@ -704,15 +715,19 @@ export default function HomeScreen({ navigation }) {
                           }
                         }}
                       >
-                        <Text
-                          style={{
-                            fontWeight: "bold",
-                            color: "white",
-                            fontSize: 18,
-                          }}
-                        >
-                          Sign Up
-                        </Text>
+                        {isLoading ? (
+                          <View>{isLoading}</View>
+                        ) : (
+                          <Text
+                            style={{
+                              fontWeight: "bold",
+                              color: "white",
+                              fontSize: 18,
+                            }}
+                          >
+                            Sign Up
+                          </Text>
+                        )}
                       </TouchableOpacity>
                     </View>
                   </View>

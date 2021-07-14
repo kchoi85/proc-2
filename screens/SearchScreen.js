@@ -23,6 +23,10 @@ export default function SearchScreen({ navigation, route }) {
   const [searchText, setSearchText] = React.useState("Top Categories");
   const [reses, setReses] = React.useState([]);
 
+  let {
+    address, // 18 Yonge St
+  } = useSelector((state) => state.userReducer);
+
   React.useEffect(() => {
     if (route.params != null) {
       const { name } = route.params.item;
@@ -68,9 +72,7 @@ export default function SearchScreen({ navigation, route }) {
             }}
             onPress={() => navigation.navigate("LocationScreen")}
           >
-            <Text style={{ fontSize: 24, fontWeight: "bold" }}>
-              18 Yonge St
-            </Text>
+            <Text style={{ fontSize: 24, fontWeight: "bold" }}>{address}</Text>
             <Text style={{ fontSize: 10, paddingLeft: 5 }}>▼</Text>
           </TouchableOpacity>
         </View>

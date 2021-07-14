@@ -73,7 +73,7 @@ export default function HelpScreen({ navigation }) {
   }
 
   function renderBody() {
-    let AUTHOR = "Kihoon Choi";
+    let AUTHOR = "Kihoon David Choi";
     let RELEASE_DATE = "July 2021";
     let RELEASE_VERSION = "1.0.1";
     let CUSTOMER_SUP_PHONE = "519-871-4038";

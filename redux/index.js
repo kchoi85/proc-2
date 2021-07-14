@@ -26,30 +26,45 @@ const userReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         openedFirstTime: false,
-
-        location: action.payload.location,
+        locationObj: action.payload.locationObj,
         address: action.payload.address,
         subaddress: action.payload.subaddress,
-        deliveryInst: action.payload.deliveryInst,
+        deliveryInstruction: action.payload.deliveryInstruction,
       };
-    case "DO_LOGIN":
+    case "DO_LOGIN_FROM_MODAL":
       return {
         ...state,
         user: action.payload,
         userLoggedIn: true,
+      };
+    case "DO_REGISTER_FROM_MODAL":
+      return {
+        ...state,
+        user: action.payload,
+        userLoggedIn: true,
+      };
+    case "DO_LOGIN_FROM_SETTINGS":
+      return {
+        ...state,
+        user: action.payload,
+        userLoggedIn: true,
+        openedFirstTime: false,
+      };
+    case "DO_REGISTER_FROM_SETTINGS":
+      return {
+        ...state,
+        user: action.payload,
+        userLoggedIn: true,
+        openedFirstTime: false,
       };
     case "DO_LOGOUT":
       return {
+        ...state,
         userLoggedIn: false,
+        openedFirstTime: false,
         user: {},
         menu: [],
         favRes: [],
-      };
-    case "DO_REGISTER":
-      return {
-        ...state,
-        user: action.payload,
-        userLoggedIn: true,
       };
     case "DO_FAVORITE":
       const favRes = [...state.favRes];

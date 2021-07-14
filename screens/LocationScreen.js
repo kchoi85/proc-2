@@ -13,39 +13,13 @@ import {
 } from "react-native";
 import { icons, COLORS, SIZES, FONTS, images } from "../constants";
 import { useSelector } from "react-redux";
-import * as Location from "expo-location";
 
-export default function LocationScreen({ navigation }) {
-  const [location, setLocation] = React.useState(null);
-  const [errorMsg, setErrorMsg] = React.useState(null);
-
-  React.useEffect(() => {
-    (async () => {
-      if (Platform.OS === "ios") {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          setErrorMsg("Permission to access location was denied");
-        }
-        let location = await Location.getCurrentPositionAsync({});
-        setLocation(location);
-      } else if (Platform.OS === "android") {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          setErrorMsg("Permission to access location was denied");
-        }
-        let location = await Location.getCurrentPositionAsync({});
-        setLocation(location);
-      }
-    })(); // self invoked
-  }, []);
-
-  let text = "Waiting...";
-  if (errorMsg) {
-    text = errorMsg;
-    alert(text);
-  } else if (location) {
-    text = JSON.stringify(location);
-  }
+export default function LocationScreen({ navigation, route }) {
+  let { address, subaddress, deliveryInstruction, locationObj } = useSelector(
+    (state) => state.userReducer
+  );
+  locationObj = JSON.stringify(locationObj);
+  // React.useEffect(() => {}, []);
 
   function renderHeader() {
     return (
@@ -106,7 +80,10 @@ export default function LocationScreen({ navigation }) {
   function locationInfo() {
     return (
       <View style={styles.body}>
-        <Text>{text}</Text>
+        <Text>Address: {address}</Text>
+        <Text>Sub Address: {subaddress}</Text>
+        <Text>Delivery Instructions: {deliveryInstruction}</Text>
+        <Text>Location Coords: {locationObj}</Text>
       </View>
     );
   }

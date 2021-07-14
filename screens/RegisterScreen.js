@@ -17,7 +17,6 @@ import { store } from "../redux/index";
 import axios from "axios";
 import { EXPRESS_SERVER, GOOGLE_MAPS_API } from "@env";
 
-
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = React.useState(null);
   const [id, setId] = React.useState(null); //email
@@ -109,7 +108,10 @@ export default function RegisterScreen({ navigation }) {
           address,
         }
       );
-      store.dispatch({ type: "DO_REGISTER", payload: response.data });
+      store.dispatch({
+        type: "DO_REGISTER_FROM_SETTINGS",
+        payload: response.data,
+      });
     } catch (error) {
       store.dispatch({ type: "ON_ERROR", payload: error });
     }

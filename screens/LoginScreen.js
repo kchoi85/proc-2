@@ -35,6 +35,21 @@ export default function LoginScreen({ navigation }) {
     }
   });
 
+  const onUserLogin = async ({ email, password }) => {
+    try {
+      const response = await axios.post(`${EXPRESS_SERVER}/users/loginUser`, {
+        email,
+        password,
+      });
+      store.dispatch({
+        type: "DO_LOGIN_FROM_SETTINGS",
+        payload: response.data,
+      });
+    } catch (error) {
+      store.dispatch({ type: "ON_ERROR", payload: error });
+    }
+  };
+
   function renderHeader() {
     return (
       <View
@@ -91,21 +106,6 @@ export default function LoginScreen({ navigation }) {
     );
   }
 
-  const onUserLogin = async ({ email, password }) => {
-    try {
-      const response = await axios.post(
-        `${EXPRESS_SERVER}/users/loginUser`,
-        {
-          email,
-          password,
-        }
-      );
-      store.dispatch({ type: "DO_LOGIN", payload: response.data });
-    } catch (error) {
-      store.dispatch({ type: "ON_ERROR", payload: error });
-    }
-  };
-
   function renderLogin() {
     return (
       <View style={styles.body}>
@@ -131,10 +131,6 @@ export default function LoginScreen({ navigation }) {
             style={styles.buttonLogin}
             onPress={() => {
               onUserLogin({ email: id, password: pass });
-
-              //   setTimeout(() => {
-              //     navigation.goBack();
-              //   }, 2000);
             }}
           >
             <Text style={{ color: "#FFF" }}>Login</Text>

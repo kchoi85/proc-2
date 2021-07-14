@@ -26,7 +26,7 @@ export default function OrderScreen({ navigation }) {
   );
   const [ordersArray, setOrdersArray] = React.useState([]);
 
-  let { user } = useSelector((state) => state.userReducer);
+  let { user, address } = useSelector((state) => state.userReducer);
   let uid = user?._id;
 
   React.useEffect(() => {
@@ -46,7 +46,7 @@ export default function OrderScreen({ navigation }) {
       }
     }
     onOrders({ userId: uid });
-  }, []);
+  }, [user]);
 
   function renderHeader() {
     return (
@@ -72,9 +72,7 @@ export default function OrderScreen({ navigation }) {
             }}
             onPress={() => navigation.navigate("LocationScreen")}
           >
-            <Text style={{ fontSize: 24, fontWeight: "bold" }}>
-              18 Yonge St
-            </Text>
+            <Text style={{ fontSize: 24, fontWeight: "bold" }}>{address}</Text>
             <Text style={{ fontSize: 10, paddingLeft: 5 }}>▼</Text>
           </TouchableOpacity>
         </View>

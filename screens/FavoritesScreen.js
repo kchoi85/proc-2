@@ -19,7 +19,7 @@ import { useSelector } from "react-redux";
 import { EXPRESS_SERVER } from "@env";
 
 export default function FavoritesScreen({ navigation }) {
-  let { favRes } = useSelector((state) => state.userReducer);
+  let { favRes, address } = useSelector((state) => state.userReducer);
   // useSelector((state) => console.log(state.userReducer));
   const [reses, setReses] = React.useState([]);
   const [searchText, setSearchText] = React.useState(
@@ -54,9 +54,7 @@ export default function FavoritesScreen({ navigation }) {
             }}
             onPress={() => navigation.navigate("LocationScreen")}
           >
-            <Text style={{ fontSize: 24, fontWeight: "bold" }}>
-              18 Yonge St
-            </Text>
+            <Text style={{ fontSize: 24, fontWeight: "bold" }}>{address}</Text>
             <Text style={{ fontSize: 10, paddingLeft: 5 }}>▼</Text>
           </TouchableOpacity>
         </View>
